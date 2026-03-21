@@ -1,9 +1,18 @@
+export type ConnectionState = 'disconnected' | 'connecting' | 'connected' | 'reconnecting'
+
 type MessageHandler = (data: unknown) => void
+type ConnectionStateHandler = (state: ConnectionState) => void
 
 interface WebSocketManagerOptions {
   maxReconnectAttempts?: number
   initialReconnectDelay?: number
   maxReconnectDelay?: number
+}
+
+export interface WsEnvelope {
+  type: string
+  topic?: string
+  payload?: unknown
 }
 
 export class WebSocketManager {
@@ -12,10 +21,13 @@ export class WebSocketManager {
   private token: string = ''
   private topics: Set<string> = new Set()
   private messageHandlers: Map<string, MessageHandler[]> = new Map()
+  private connectionStateHandlers: Set<ConnectionStateHandler> = new Set()
   private reconnectAttempts: number = 0
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null
-  private isConnecting: boolean = false
   private shouldReconnect: boolean = true
+  private _connectionState: ConnectionState = 'disconnected'
+  private _reconnectCountdown: number = 0
+  private countdownTimer: ReturnType<typeof setInterval> | null = null
 
   private maxReconnectAttempts: number
   private initialReconnectDelay: number
@@ -27,6 +39,28 @@ export class WebSocketManager {
     this.maxReconnectDelay = options.maxReconnectDelay ?? 30000
   }
 
+  get connectionState(): ConnectionState {
+    return this._connectionState
+  }
+
+  get reconnectCountdown(): number {
+    return this._reconnectCountdown
+  }
+
+  private setConnectionState(state: ConnectionState): void {
+    this._connectionState = state
+    for (const handler of this.connectionStateHandlers) {
+      handler(state)
+    }
+  }
+
+  onConnectionStateChange(handler: ConnectionStateHandler): () => void {
+    this.connectionStateHandlers.add(handler)
+    return () => {
+      this.connectionStateHandlers.delete(handler)
+    }
+  }
+
   connect(url: string, token: string): void {
     this.url = url
     this.token = token
@@ -35,21 +69,30 @@ export class WebSocketManager {
   }
 
   private doConnect(): void {
-    if (this.isConnecting || (this.ws && this.ws.readyState === WebSocket.OPEN)) {
+    if (this._connectionState === 'connected') {
       return
     }
 
-    this.isConnecting = true
+    if (this.reconnectAttempts > 0) {
+      this.setConnectionState('reconnecting')
+    } else {
+      this.setConnectionState('connecting')
+    }
 
     const wsUrl = `${this.url}?token=${encodeURIComponent(this.token)}`
     this.ws = new WebSocket(wsUrl)
 
     this.ws.onopen = () => {
-      this.isConnecting = false
       this.reconnectAttempts = 0
+      this._reconnectCountdown = 0
+      this.clearCountdownTimer()
+      this.setConnectionState('connected')
       console.log('[WS] Connected')
 
-      // Re-subscribe to all topics
+      // Auto-subscribe to telemetry wildcard
+      this.subscribe('telemetry:*')
+
+      // Re-subscribe to all tracked topics
       for (const topic of this.topics) {
         this.sendSubscribe(topic)
       }
@@ -57,35 +100,28 @@ export class WebSocketManager {
 
     this.ws.onmessage = (event: MessageEvent) => {
       try {
-        const message = JSON.parse(event.data as string) as {
-          topic?: string
-          type?: string
-          [key: string]: unknown
-        }
-        const topic = message.topic ?? message.type ?? 'default'
+        const envelope = JSON.parse(event.data as string) as WsEnvelope
+        const msgType = envelope.type ?? 'unknown'
+        const topic = envelope.topic ?? msgType
 
-        const handlers = this.messageHandlers.get(topic)
-        if (handlers) {
-          for (const handler of handlers) {
-            handler(message)
-          }
+        // Dispatch to type-based handlers (e.g. "telemetry")
+        this.dispatchToHandlers(msgType, envelope)
+
+        // Dispatch to topic-based handlers if topic differs from type
+        if (topic !== msgType) {
+          this.dispatchToHandlers(topic, envelope)
         }
 
-        // Also notify wildcard handlers
-        const wildcardHandlers = this.messageHandlers.get('*')
-        if (wildcardHandlers) {
-          for (const handler of wildcardHandlers) {
-            handler(message)
-          }
-        }
+        // Dispatch to wildcard handlers
+        this.dispatchToHandlers('*', envelope)
       } catch (err) {
         console.error('[WS] Failed to parse message:', err)
       }
     }
 
     this.ws.onclose = () => {
-      this.isConnecting = false
       console.log('[WS] Disconnected')
+      this.setConnectionState('disconnected')
 
       if (this.shouldReconnect) {
         this.scheduleReconnect()
@@ -94,13 +130,29 @@ export class WebSocketManager {
 
     this.ws.onerror = (error) => {
       console.error('[WS] Error:', error)
-      this.isConnecting = false
+    }
+  }
+
+  private dispatchToHandlers(key: string, envelope: WsEnvelope): void {
+    const handlers = this.messageHandlers.get(key)
+    if (handlers) {
+      for (const handler of handlers) {
+        handler(envelope)
+      }
+    }
+  }
+
+  private clearCountdownTimer(): void {
+    if (this.countdownTimer) {
+      clearInterval(this.countdownTimer)
+      this.countdownTimer = null
     }
   }
 
   private scheduleReconnect(): void {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
       console.error('[WS] Max reconnect attempts reached')
+      this.setConnectionState('disconnected')
       return
     }
 
@@ -109,11 +161,25 @@ export class WebSocketManager {
       this.maxReconnectDelay,
     )
 
+    this._reconnectCountdown = Math.ceil(delay / 1000)
+    this.setConnectionState('reconnecting')
+
     console.log(
       `[WS] Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts + 1}/${this.maxReconnectAttempts})`,
     )
 
+    // Update countdown every second
+    this.clearCountdownTimer()
+    this.countdownTimer = setInterval(() => {
+      this._reconnectCountdown = Math.max(0, this._reconnectCountdown - 1)
+      // Notify state handlers so UI updates countdown
+      for (const handler of this.connectionStateHandlers) {
+        handler(this._connectionState)
+      }
+    }, 1000)
+
     this.reconnectTimer = setTimeout(() => {
+      this.clearCountdownTimer()
       this.reconnectAttempts++
       this.doConnect()
     }, delay)
@@ -139,16 +205,16 @@ export class WebSocketManager {
     }
   }
 
-  onMessage(topic: string, handler: MessageHandler): () => void {
-    const handlers = this.messageHandlers.get(topic) ?? []
+  onMessage(key: string, handler: MessageHandler): () => void {
+    const handlers = this.messageHandlers.get(key) ?? []
     handlers.push(handler)
-    this.messageHandlers.set(topic, handlers)
+    this.messageHandlers.set(key, handlers)
 
     return () => {
-      const current = this.messageHandlers.get(topic)
+      const current = this.messageHandlers.get(key)
       if (current) {
         this.messageHandlers.set(
-          topic,
+          key,
           current.filter((h) => h !== handler),
         )
       }
@@ -157,6 +223,7 @@ export class WebSocketManager {
 
   disconnect(): void {
     this.shouldReconnect = false
+    this.clearCountdownTimer()
     if (this.reconnectTimer) {
       clearTimeout(this.reconnectTimer)
       this.reconnectTimer = null
@@ -165,10 +232,11 @@ export class WebSocketManager {
       this.ws.close()
       this.ws = null
     }
+    this.setConnectionState('disconnected')
   }
 
   get isConnected(): boolean {
-    return this.ws !== null && this.ws.readyState === WebSocket.OPEN
+    return this._connectionState === 'connected'
   }
 }
 

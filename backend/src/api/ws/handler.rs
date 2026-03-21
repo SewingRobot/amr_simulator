@@ -7,8 +7,11 @@ use axum::{
 };
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
+use tokio::sync::broadcast;
+use tokio::time::{self, Duration};
 
 use crate::api::AppState;
+use crate::grpc::telemetry::{SimCommand, TelemetryMessage};
 use crate::services::auth_service;
 
 #[derive(Debug, Deserialize)]
@@ -25,6 +28,8 @@ enum WsClientMessage {
     Unsubscribe { topic: String },
     #[serde(rename = "ping")]
     Ping,
+    #[serde(rename = "command")]
+    Command { payload: SimCommand },
 }
 
 #[derive(Debug, Serialize)]
@@ -54,62 +59,122 @@ pub async fn ws_handler(
     if let Some(ref token) = query.token {
         match auth_service::validate_jwt(token, &state.config.jwt_secret) {
             Ok(claims) => {
-                tracing::info!("WebSocket connection authenticated for user: {}", claims.email);
+                tracing::info!(
+                    "WebSocket connection authenticated for user: {}",
+                    claims.email
+                );
             }
             Err(e) => {
                 tracing::warn!("WebSocket auth failed: {}", e);
-                // Still allow connection but log the warning
-                // In production, you might reject unauthenticated connections
             }
         }
     }
 
-    ws.on_upgrade(|socket| handle_socket(socket))
+    let telemetry_rx = state.telemetry_tx.subscribe();
+    let sim_client = state.sim_client.clone();
+
+    ws.on_upgrade(move |socket| handle_socket(socket, telemetry_rx, sim_client))
 }
 
-async fn handle_socket(mut socket: WebSocket) {
+async fn handle_socket(
+    mut socket: WebSocket,
+    mut telemetry_rx: broadcast::Receiver<TelemetryMessage>,
+    sim_client: std::sync::Arc<crate::grpc::sim_client::SimEngineClient>,
+) {
     let mut subscriptions: HashSet<String> = HashSet::new();
+    let mut heartbeat_interval = time::interval(Duration::from_secs(30));
 
     tracing::info!("WebSocket client connected");
 
-    while let Some(msg) = socket.recv().await {
-        let msg = match msg {
-            Ok(msg) => msg,
-            Err(e) => {
-                tracing::error!("WebSocket receive error: {}", e);
-                break;
-            }
-        };
-
-        match msg {
-            Message::Text(text) => {
-                let response = match serde_json::from_str::<WsClientMessage>(&text) {
-                    Ok(WsClientMessage::Subscribe { topic }) => {
-                        subscriptions.insert(topic.clone());
-                        tracing::debug!("Client subscribed to: {}", topic);
-                        WsServerMessage::Subscribed { topic }
+    loop {
+        tokio::select! {
+            // Incoming message from the WebSocket client
+            maybe_msg = socket.recv() => {
+                let msg = match maybe_msg {
+                    Some(Ok(msg)) => msg,
+                    Some(Err(e)) => {
+                        tracing::error!("WebSocket receive error: {}", e);
+                        break;
                     }
-                    Ok(WsClientMessage::Unsubscribe { topic }) => {
-                        subscriptions.remove(&topic);
-                        tracing::debug!("Client unsubscribed from: {}", topic);
-                        WsServerMessage::Unsubscribed { topic }
-                    }
-                    Ok(WsClientMessage::Ping) => WsServerMessage::Pong,
-                    Err(e) => WsServerMessage::Error {
-                        message: format!("Invalid message: {}", e),
-                    },
+                    None => break, // stream ended
                 };
 
-                let response_text = serde_json::to_string(&response).unwrap();
-                if socket.send(Message::Text(response_text.into())).await.is_err() {
+                match msg {
+                    Message::Text(text) => {
+                        let response = match serde_json::from_str::<WsClientMessage>(&text) {
+                            Ok(WsClientMessage::Subscribe { topic }) => {
+                                subscriptions.insert(topic.clone());
+                                tracing::debug!("Client subscribed to: {}", topic);
+                                Some(WsServerMessage::Subscribed { topic })
+                            }
+                            Ok(WsClientMessage::Unsubscribe { topic }) => {
+                                subscriptions.remove(&topic);
+                                tracing::debug!("Client unsubscribed from: {}", topic);
+                                Some(WsServerMessage::Unsubscribed { topic })
+                            }
+                            Ok(WsClientMessage::Ping) => Some(WsServerMessage::Pong),
+                            Ok(WsClientMessage::Command { payload }) => {
+                                let client = sim_client.clone();
+                                // Fire and forget; report errors back to client
+                                if let Err(e) = client.send_command(&payload).await {
+                                    tracing::warn!("Failed to send command to sim engine: {}", e);
+                                    Some(WsServerMessage::Error {
+                                        message: format!("Command relay failed: {}", e),
+                                    })
+                                } else {
+                                    None // no response needed on success
+                                }
+                            }
+                            Err(e) => Some(WsServerMessage::Error {
+                                message: format!("Invalid message: {}", e),
+                            }),
+                        };
+
+                        if let Some(resp) = response {
+                            let text = serde_json::to_string(&resp).unwrap();
+                            if socket.send(Message::Text(text.into())).await.is_err() {
+                                break;
+                            }
+                        }
+                    }
+                    Message::Close(_) => {
+                        tracing::info!("WebSocket client disconnected");
+                        break;
+                    }
+                    _ => {}
+                }
+            }
+
+            // Telemetry from the sim engine broadcast channel
+            result = telemetry_rx.recv() => {
+                match result {
+                    Ok(msg) => {
+                        if should_forward(&subscriptions, &msg) {
+                            let topic = format!("telemetry:{}", msg.robot_id);
+                            let data = serde_json::to_value(&msg).unwrap();
+                            let server_msg = WsServerMessage::Telemetry { topic, data };
+                            let text = serde_json::to_string(&server_msg).unwrap();
+                            if socket.send(Message::Text(text.into())).await.is_err() {
+                                break;
+                            }
+                        }
+                    }
+                    Err(broadcast::error::RecvError::Lagged(n)) => {
+                        tracing::warn!("WebSocket client lagged, skipped {} telemetry messages", n);
+                    }
+                    Err(broadcast::error::RecvError::Closed) => {
+                        tracing::info!("Telemetry broadcast channel closed");
+                        break;
+                    }
+                }
+            }
+
+            // Heartbeat ping
+            _ = heartbeat_interval.tick() => {
+                if socket.send(Message::Ping(vec![].into())).await.is_err() {
                     break;
                 }
             }
-            Message::Close(_) => {
-                tracing::info!("WebSocket client disconnected");
-                break;
-            }
-            _ => {}
         }
     }
 
@@ -117,4 +182,18 @@ async fn handle_socket(mut socket: WebSocket) {
         "WebSocket session ended, had {} subscriptions",
         subscriptions.len()
     );
+}
+
+/// Check whether a telemetry message matches any of the client's subscriptions.
+///
+/// Supported subscription patterns:
+/// - `telemetry:*` — matches all robots
+/// - `telemetry:{robot_id}` — matches a specific robot
+fn should_forward(subscriptions: &HashSet<String>, msg: &TelemetryMessage) -> bool {
+    if subscriptions.is_empty() {
+        return false;
+    }
+    let wildcard = "telemetry:*";
+    let specific = format!("telemetry:{}", msg.robot_id);
+    subscriptions.contains(wildcard) || subscriptions.contains(&specific)
 }

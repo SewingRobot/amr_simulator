@@ -1,6 +1,10 @@
 import { useRef } from 'react'
-import type { Mesh } from 'three'
-import { Euler, Quaternion } from 'three'
+import { useFrame } from '@react-three/fiber'
+import {
+  Quaternion as ThreeQuaternion,
+  Vector3 as ThreeVector3,
+} from 'three'
+import type { Group } from 'three'
 import { enuToThreeJS, enuQuaternionToThreeJS } from '../../utils/math'
 import type { Pose } from '../../types/robot'
 
@@ -19,24 +23,43 @@ export function RobotModel({
   name,
   onClick,
 }: RobotModelProps) {
-  const meshRef = useRef<Mesh>(null)
+  const groupRef = useRef<Group>(null)
+  const targetPos = useRef(new ThreeVector3())
+  const targetQuat = useRef(new ThreeQuaternion())
+  const initialized = useRef(false)
 
-  // Convert ENU pose to Three.js coordinates
-  const position = enuToThreeJS(
+  // Update target pose every render (driven by store changes)
+  const [tx, ty, tz] = enuToThreeJS(
     pose.position.x,
     pose.position.y,
     pose.position.z,
   )
+  targetPos.current.set(tx, ty, tz)
 
-  const threeQuat = enuQuaternionToThreeJS(pose.orientation)
-  const euler = new Euler().setFromQuaternion(
-    new Quaternion(threeQuat.x, threeQuat.y, threeQuat.z, threeQuat.w),
-  )
+  const tq = enuQuaternionToThreeJS(pose.orientation)
+  targetQuat.current.set(tq.x, tq.y, tq.z, tq.w)
+
+  useFrame((_, delta) => {
+    if (!groupRef.current) return
+
+    if (!initialized.current) {
+      // Snap to initial position on first frame
+      groupRef.current.position.copy(targetPos.current)
+      groupRef.current.quaternion.copy(targetQuat.current)
+      initialized.current = true
+      return
+    }
+
+    // Smooth interpolation: lerp position, slerp rotation
+    const lerpFactor = Math.min(1, delta * 15)
+    groupRef.current.position.lerp(targetPos.current, lerpFactor)
+    groupRef.current.quaternion.slerp(targetQuat.current, lerpFactor)
+  })
 
   return (
-    <group position={position} rotation={euler} onClick={onClick}>
+    <group ref={groupRef} onClick={onClick}>
       {/* Robot body: 0.5m x 0.3m x 0.2m */}
-      <mesh ref={meshRef}>
+      <mesh>
         <boxGeometry args={[0.5, 0.2, 0.3]} />
         <meshStandardMaterial
           color={selected ? '#facc15' : color}

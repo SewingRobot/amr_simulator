@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback, useState } from 'react'
-import { wsManager } from '../services/websocket'
+import { wsManager, type ConnectionState } from '../services/websocket'
 
 interface UseWebSocketOptions {
   url: string
@@ -16,7 +16,9 @@ export function useWebSocket({
   onMessage,
   enabled = true,
 }: UseWebSocketOptions) {
-  const [isConnected, setIsConnected] = useState(false)
+  const [connectionState, setConnectionState] = useState<ConnectionState>(
+    wsManager.connectionState,
+  )
   const onMessageRef = useRef(onMessage)
   onMessageRef.current = onMessage
 
@@ -26,7 +28,6 @@ export function useWebSocket({
 
   const disconnect = useCallback(() => {
     wsManager.disconnect()
-    setIsConnected(false)
   }, [])
 
   useEffect(() => {
@@ -34,13 +35,12 @@ export function useWebSocket({
 
     connect()
 
-    // Poll connection status
-    const interval = setInterval(() => {
-      setIsConnected(wsManager.isConnected)
-    }, 1000)
+    const unsubState = wsManager.onConnectionStateChange((state) => {
+      setConnectionState(state)
+    })
 
     return () => {
-      clearInterval(interval)
+      unsubState()
       disconnect()
     }
   }, [enabled, connect, disconnect])
@@ -72,7 +72,8 @@ export function useWebSocket({
   }, [enabled])
 
   return {
-    isConnected,
+    isConnected: connectionState === 'connected',
+    connectionState,
     connect,
     disconnect,
   }

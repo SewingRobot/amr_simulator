@@ -1,9 +1,13 @@
 import { useRobotStore } from '../../stores/robotStore'
+import { useWebSocketTelemetry } from '../../hooks/useWebSocketTelemetry'
 import { RobotModel } from './RobotModel'
 
 const ROBOT_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899']
 
 export function RobotManager() {
+  // Connect to WebSocket and feed telemetry into robotStore
+  useWebSocketTelemetry()
+
   const robots = useRobotStore((state) => state.robots)
   const selectedRobotId = useRobotStore((state) => state.selectedRobotId)
   const selectRobot = useRobotStore((state) => state.selectRobot)

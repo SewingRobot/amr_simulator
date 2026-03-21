@@ -27,6 +27,8 @@ void Simulation::loadWorld(const std::string& path) {
 }
 
 uint64_t Simulation::spawnRobot(double x, double y, double theta) {
+    std::lock_guard<std::mutex> lock(robots_mutex_);
+
     uint64_t id = next_robot_id_++;
 
     RobotConfig rcfg;
@@ -43,6 +45,8 @@ uint64_t Simulation::spawnRobot(double x, double y, double theta) {
 }
 
 void Simulation::removeRobot(uint64_t robot_id) {
+    std::lock_guard<std::mutex> lock(robots_mutex_);
+
     auto it = robots_.find(robot_id);
     if (it == robots_.end()) {
         spdlog::warn("removeRobot: robot {} not found", robot_id);
@@ -55,6 +59,8 @@ void Simulation::removeRobot(uint64_t robot_id) {
 }
 
 void Simulation::sendCommand(uint64_t robot_id, double linear, double angular) {
+    std::lock_guard<std::mutex> lock(robots_mutex_);
+
     auto it = robots_.find(robot_id);
     if (it == robots_.end()) {
         spdlog::warn("sendCommand: robot {} not found", robot_id);
@@ -66,22 +72,30 @@ void Simulation::sendCommand(uint64_t robot_id, double linear, double angular) {
 void Simulation::step() {
     double dt = config_.timestep_s;
 
-    // Update robot kinematics
-    for (auto& [id, robot] : robots_) {
-        robot.update(dt);
-        Pose2D pose = robot.getDrive().getPose();
-        Velocity2D vel = robot.getDrive().getVelocity();
-        physics_->setBodyVelocity(robot_bodies_.at(id), vel);
+    // Process any queued commands before stepping
+    processCommandQueue();
+
+    {
+        std::lock_guard<std::mutex> lock(robots_mutex_);
+
+        // Update robot kinematics
+        for (auto& [id, robot] : robots_) {
+            robot.update(dt);
+            Velocity2D vel = robot.getDrive().getVelocity();
+            physics_->setBodyVelocity(robot_bodies_.at(id), vel);
+        }
+
+        // Step physics
+        physics_->step(dt);
+
+        // Sync physics poses back to robots
+        for (auto& [id, robot] : robots_) {
+            Pose2D pose = physics_->getBodyPose(robot_bodies_.at(id));
+            robot.getDrive().setPose(pose);
+        }
     }
 
-    // Step physics
-    physics_->step(dt);
-
-    // Sync physics poses back to robots
-    for (auto& [id, robot] : robots_) {
-        Pose2D pose = physics_->getBodyPose(robot_bodies_.at(id));
-        robot.getDrive().setPose(pose);
-    }
+    sim_time_ += dt;
 }
 
 void Simulation::start() {
@@ -90,11 +104,24 @@ void Simulation::start() {
 
     auto step_duration = std::chrono::duration<double>(config_.timestep_s / config_.realtime_factor);
 
-    while (running_) {
+    // Telemetry broadcast interval: 10 Hz
+    constexpr double telemetry_interval_s = 0.1;
+    double telemetry_accum = 0.0;
+
+    while (running_.load()) {
         auto t0 = std::chrono::steady_clock::now();
         step();
-        auto t1 = std::chrono::steady_clock::now();
 
+        // Fire post-step callback at ~10 Hz
+        telemetry_accum += config_.timestep_s;
+        if (telemetry_accum >= telemetry_interval_s) {
+            telemetry_accum -= telemetry_interval_s;
+            if (post_step_callback_) {
+                post_step_callback_();
+            }
+        }
+
+        auto t1 = std::chrono::steady_clock::now();
         auto elapsed = t1 - t0;
         if (elapsed < step_duration) {
             std::this_thread::sleep_for(step_duration - elapsed);
@@ -102,20 +129,96 @@ void Simulation::start() {
     }
 }
 
+void Simulation::startAsync() {
+    if (running_.load()) return;
+
+    sim_thread_ = std::thread([this]() {
+        start();
+    });
+}
+
 void Simulation::stop() {
-    if (running_) {
+    if (running_.load()) {
         spdlog::info("Simulation stopping");
         running_ = false;
+
+        if (sim_thread_.joinable()) {
+            sim_thread_.join();
+        }
     }
 }
 
 Pose2D Simulation::getRobotPose(uint64_t robot_id) const {
+    std::lock_guard<std::mutex> lock(robots_mutex_);
+
     auto it = robots_.find(robot_id);
     if (it == robots_.end()) {
         spdlog::warn("getRobotPose: robot {} not found", robot_id);
         return {0.0, 0.0, 0.0};
     }
     return it->second.getDrive().getPose();
+}
+
+std::vector<RobotTelemetry> Simulation::getTelemetry() const {
+    std::lock_guard<std::mutex> lock(robots_mutex_);
+
+    auto now = std::chrono::system_clock::now();
+    double ts_ms = static_cast<double>(
+        std::chrono::duration_cast<std::chrono::milliseconds>(
+            now.time_since_epoch()).count());
+
+    std::vector<RobotTelemetry> result;
+    result.reserve(robots_.size());
+
+    for (const auto& [id, robot] : robots_) {
+        RobotTelemetry t;
+        t.robot_id = std::to_string(id);
+        t.timestamp_ms = ts_ms;
+        t.sequence_number = telemetry_seq_;
+        t.pose = robot.getDrive().getPose();
+        t.velocity = robot.getDrive().getVelocity();
+        t.battery_percent = robot.getBattery();
+
+        // Determine status based on velocity
+        double speed = std::abs(t.velocity.linear) + std::abs(t.velocity.angular);
+        t.status = (speed > 1e-6) ? "busy" : "idle";
+
+        result.push_back(std::move(t));
+    }
+
+    // Increment sequence (mutable would be cleaner but const_cast is fine here)
+    const_cast<Simulation*>(this)->telemetry_seq_++;
+
+    return result;
+}
+
+void Simulation::setPostStepCallback(StepCallback cb) {
+    post_step_callback_ = std::move(cb);
+}
+
+void Simulation::enqueueCommand(const QueuedCommand& cmd) {
+    std::lock_guard<std::mutex> lock(cmd_queue_mutex_);
+    cmd_queue_.push(cmd);
+}
+
+void Simulation::processCommandQueue() {
+    std::lock_guard<std::mutex> lock(cmd_queue_mutex_);
+    while (!cmd_queue_.empty()) {
+        auto cmd = cmd_queue_.front();
+        cmd_queue_.pop();
+
+        switch (cmd.type) {
+            case QueuedCommand::Type::SpawnRobot:
+                spawnRobot(cmd.x, cmd.y, cmd.theta);
+                break;
+            case QueuedCommand::Type::RemoveRobot:
+                removeRobot(cmd.robot_id);
+                break;
+            case QueuedCommand::Type::SendCommand:
+                sendCommand(cmd.robot_id, cmd.linear, cmd.angular);
+                break;
+        }
+    }
 }
 
 }  // namespace amr::sim

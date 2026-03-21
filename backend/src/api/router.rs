@@ -7,7 +7,7 @@ use tower_http::cors::{Any, CorsLayer};
 use tower_http::trace::TraceLayer;
 
 use super::AppState;
-use super::handlers::{auth, maps, robots};
+use super::handlers::{auth, maps, robots, sim};
 use super::middleware::auth::auth_middleware;
 use super::ws::handler::ws_handler;
 
@@ -39,6 +39,7 @@ pub fn create_router(state: AppState) -> Router {
                 .put(maps::update_map)
                 .delete(maps::delete_map),
         )
+        .route("/api/sim/command", post(sim::send_command))
         .layer(axum_middleware::from_fn_with_state(
             state.clone(),
             auth_middleware,

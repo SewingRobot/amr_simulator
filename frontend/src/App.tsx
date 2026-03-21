@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Layout } from './components/common/Layout'
+import { ConnectionStatus } from './components/common/ConnectionStatus'
 import { SceneCanvas } from './components/viewer3d/SceneCanvas'
 import { RobotInfoPanel } from './components/viewer3d/RobotInfoPanel'
 import { DashboardPage } from './components/dashboard/DashboardPage'
@@ -11,6 +12,7 @@ function App() {
 
   return (
     <Layout currentPage={page} onNavigate={setPage}>
+      <ConnectionStatus />
       {page === 'viewer' && (
         <div className="relative w-full h-full">
           <SceneCanvas />

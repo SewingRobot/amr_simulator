@@ -10,6 +10,8 @@ pub struct AppConfig {
     pub grpc_sim_engine_url: String,
     pub grpc_asset_manager_url: String,
     pub grpc_map_manager_url: String,
+    pub sim_telemetry_addr: String,
+    pub sim_command_addr: String,
 }
 
 impl AppConfig {
@@ -35,6 +37,10 @@ impl AppConfig {
                 .unwrap_or_else(|_| "http://localhost:50052".into()),
             grpc_map_manager_url: std::env::var("GRPC_MAP_MANAGER_URL")
                 .unwrap_or_else(|_| "http://localhost:50053".into()),
+            sim_telemetry_addr: std::env::var("SIM_TELEMETRY_ADDR")
+                .unwrap_or_else(|_| "127.0.0.1:50051".into()),
+            sim_command_addr: std::env::var("SIM_COMMAND_ADDR")
+                .unwrap_or_else(|_| "127.0.0.1:50052".into()),
         })
     }
 }

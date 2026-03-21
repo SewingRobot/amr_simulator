@@ -1,4 +1,6 @@
-import type { ReactNode } from 'react'
+import { useState, useEffect, type ReactNode } from 'react'
+import { wsManager, type ConnectionState } from '../../services/websocket'
+import { useRobotStore } from '../../stores/robotStore'
 
 type Page = 'viewer' | 'dashboard'
 
@@ -13,7 +15,31 @@ const navItems: { page: Page; label: string }[] = [
   { page: 'dashboard', label: 'Dashboard' },
 ]
 
+const STATE_LABELS: Record<ConnectionState, string> = {
+  connected: 'Connected',
+  connecting: 'Connecting...',
+  reconnecting: 'Reconnecting...',
+  disconnected: 'Disconnected',
+}
+
+const STATE_DOT_COLORS: Record<ConnectionState, string> = {
+  connected: 'bg-green-500',
+  connecting: 'bg-yellow-500',
+  reconnecting: 'bg-yellow-500',
+  disconnected: 'bg-red-500',
+}
+
 export function Layout({ children, currentPage, onNavigate }: LayoutProps) {
+  const [connState, setConnState] = useState<ConnectionState>(wsManager.connectionState)
+  const robotCount = useRobotStore((s) => s.robots.size)
+
+  useEffect(() => {
+    const unsub = wsManager.onConnectionStateChange((state) => {
+      setConnState(state)
+    })
+    return unsub
+  }, [])
+
   return (
     <div className="flex h-screen w-screen bg-gray-900 text-white">
       {/* Sidebar */}
@@ -52,6 +78,19 @@ export function Layout({ children, currentPage, onNavigate }: LayoutProps) {
 
         {/* Content area */}
         <div className="flex-1 overflow-hidden">{children}</div>
+
+        {/* Status bar */}
+        <footer className="h-7 flex-shrink-0 bg-gray-950 border-t border-gray-800 flex items-center px-4 gap-4 text-xs text-gray-500">
+          <div className="flex items-center gap-1.5">
+            <span
+              className={`inline-block w-1.5 h-1.5 rounded-full ${STATE_DOT_COLORS[connState]}`}
+            />
+            <span>{STATE_LABELS[connState]}</span>
+          </div>
+          <div>
+            Robots: {robotCount}
+          </div>
+        </footer>
       </main>
     </div>
   )
