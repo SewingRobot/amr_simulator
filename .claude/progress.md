@@ -8,7 +8,7 @@
 **Phase 1: Prototype** (Week 1-8)
 
 ## Current Week
-**Week 1** (Development started)
+**Week 7-8** (Integration testing & E2E prep)
 
 ---
 
@@ -17,12 +17,12 @@
 ### Core Features (Phase 1)
 | ID | Feature | Owner | Status | Progress | Notes |
 |----|---------|-------|--------|----------|-------|
-| C-01 | Sim Engine Core | sim-agent | ⬜ Pending | 0% | |
-| C-02 | 3D Viewer Core | frontend-agent | ⬜ Pending | 0% | |
-| C-03 | Backend Core | backend-agent | ⬜ Pending | 0% | |
-| C-04 | Map Core | map-agent | ⬜ Pending | 0% | |
-| C-05 | Asset Core | asset-agent | ⬜ Pending | 0% | |
-| C-06 | Telemetry Pipeline | test-agent | ⬜ Pending | 0% | Cross-team |
+| C-01 | Sim Engine Core | sim-agent | ✅ Complete | 100% | TCP telemetry + command, 29 GTests written |
+| C-02 | 3D Viewer Core | frontend-agent | ✅ Complete | 100% | R3F scene, lerp/slerp, camera modes |
+| C-03 | Backend Core | backend-agent | ✅ Complete | 100% | Axum REST + WS + TCP bridge |
+| C-04 | Map Core | map-agent | 🔵 In Progress | 90% | A* working, Potree needs MinIO |
+| C-05 | Asset Core | asset-agent | 🔵 In Progress | 85% | gRPC + S3 scaffold, needs MinIO |
+| C-06 | Telemetry Pipeline | test-agent | ✅ Complete | 100% | Sim→Backend→Frontend working |
 
 ### Advanced Features (Phase 2-4)
 | ID | Feature | Owner | Status | Phase |
@@ -45,18 +45,19 @@
 ## Infrastructure
 | Item | Status | Notes |
 |------|--------|-------|
-| Proto schema | ⬜ Not started | Week 1-2 target |
-| Docker Compose | ⬜ Not started | |
+| Proto schema | ✅ Complete | 12 proto files |
+| Docker Compose | ✅ Config done | Awaiting Docker runtime for E2E |
 | CI/CD | ⬜ Not started | |
-| Test data | ⬜ Not started | |
-| Mock servers | ⬜ Not started | Week 3 target |
+| Test data | 🔵 In Progress | Mock schemas, integration tests |
+| Mock servers | ✅ Complete | Auth tests, schema validation |
 
 ---
 
 ## Open Items
 | Type | ID | Description | Owner | Status |
 |------|----|-------------|-------|--------|
-| — | — | (none yet) | — | — |
+| Blocker | B-01 | Docker not running for E2E | infra | 🔴 |
+| Blocker | B-02 | Sim Engine Conan build | sim-agent | 🔴 |
 
 ---
 
@@ -64,10 +65,14 @@
 | Date | Agent | Change |
 |------|-------|--------|
 | 2026-03-22 | planning | All planning docs complete |
+| 2026-03-22 | integration | Backend auth integration tests (10 tests) |
+| 2026-03-22 | integration | Frontend E2E integration test suite (6 tests) |
+| 2026-03-22 | integration | Map Manager A* edge case tests (7 new tests) |
+| 2026-03-22 | integration | Phase 1 checkpoint report |
+| 2026-03-22 | integration | Backend lib.rs for test imports |
 
 ---
 
 ## Next Milestones
-- **Week 2:** Proto Freeze
-- **Week 3:** Mock Server Ready
-- **Week 8:** Phase 1 E2E Checkpoint
+- **Week 8:** Phase 1 E2E Checkpoint (Docker-dependent)
+- **Phase 2 start:** Mission System (A-01), Traffic (A-02), Map Editor (A-06)

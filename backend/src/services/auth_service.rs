@@ -64,10 +64,12 @@ pub fn generate_jwt(
 
 /// Validate a JWT token and return the claims.
 pub fn validate_jwt(token: &str, secret: &str) -> Result<Claims> {
+    let mut validation = Validation::default();
+    validation.leeway = 0; // Strict expiration check
     let token_data = decode::<Claims>(
         token,
         &DecodingKey::from_secret(secret.as_bytes()),
-        &Validation::default(),
+        &validation,
     )
     .context("Failed to decode JWT")?;
 

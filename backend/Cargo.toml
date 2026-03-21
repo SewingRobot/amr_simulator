@@ -43,3 +43,7 @@ tonic-build = "0.13"
 
 [dev-dependencies]
 axum-test = "16"
+
+[[test]]
+name = "auth_tests"
+path = "tests/auth_tests.rs"

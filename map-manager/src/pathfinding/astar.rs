@@ -242,4 +242,170 @@ mod tests {
         assert_eq!(result.node_ids, vec![a, b, c]);
         assert!((result.total_distance - 3.0).abs() < f64::EPSILON);
     }
+
+    #[test]
+    fn test_find_path_bidirectional_edges() {
+        let mut graph = Graph::new();
+        let a = Uuid::new_v4();
+        let b = Uuid::new_v4();
+        let c = Uuid::new_v4();
+
+        graph.add_node(a);
+        graph.add_node(b);
+        graph.add_node(c);
+
+        // Add bidirectional edges
+        graph.add_edge(a, b, 1.0);
+        graph.add_edge(b, a, 1.0);
+        graph.add_edge(b, c, 1.0);
+        graph.add_edge(c, b, 1.0);
+
+        let mut positions = HashMap::new();
+        positions.insert(a, (0.0, 0.0, 0.0));
+        positions.insert(b, (1.0, 0.0, 0.0));
+        positions.insert(c, (2.0, 0.0, 0.0));
+
+        // Forward path a -> b -> c
+        let fwd = find_path(&graph, a, c, &positions).unwrap();
+        assert_eq!(fwd.node_ids, vec![a, b, c]);
+
+        // Reverse path c -> b -> a (only works with bidirectional edges)
+        let rev = find_path(&graph, c, a, &positions).unwrap();
+        assert_eq!(rev.node_ids, vec![c, b, a]);
+        assert!((fwd.total_distance - rev.total_distance).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn test_find_path_cost_factor_weighting() {
+        // Simulate cost_factor: short-distance but high-cost edge vs longer but cheaper path
+        let mut graph = Graph::new();
+        let a = Uuid::new_v4();
+        let b = Uuid::new_v4();
+        let c = Uuid::new_v4();
+
+        graph.add_node(a);
+        graph.add_node(b);
+        graph.add_node(c);
+
+        // Direct edge a->c with distance=2 * cost_factor=5 => effective cost 10
+        graph.add_edge(a, c, 2.0 * 5.0);
+        // Indirect a->b->c with lower effective cost: (1*1) + (1*1) = 2
+        graph.add_edge(a, b, 1.0 * 1.0);
+        graph.add_edge(b, c, 1.0 * 1.0);
+
+        let mut positions = HashMap::new();
+        positions.insert(a, (0.0, 0.0, 0.0));
+        positions.insert(b, (1.0, 0.0, 0.0));
+        positions.insert(c, (2.0, 0.0, 0.0));
+
+        let result = find_path(&graph, a, c, &positions).unwrap();
+        // Should prefer the cheaper indirect path
+        assert_eq!(result.node_ids, vec![a, b, c]);
+        assert!((result.total_distance - 2.0).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn test_find_path_large_graph_performance() {
+        // 100-node linear graph: 0 -> 1 -> 2 -> ... -> 99
+        let node_ids: Vec<Uuid> = (0..100).map(|_| Uuid::new_v4()).collect();
+
+        let mut graph = Graph::new();
+        let mut positions = HashMap::new();
+
+        for (i, &id) in node_ids.iter().enumerate() {
+            graph.add_node(id);
+            positions.insert(id, (i as f64, 0.0, 0.0));
+        }
+
+        for i in 0..99 {
+            graph.add_edge(node_ids[i], node_ids[i + 1], 1.0);
+        }
+
+        let start = std::time::Instant::now();
+        let result = find_path(&graph, node_ids[0], node_ids[99], &positions).unwrap();
+        let elapsed = start.elapsed();
+
+        assert_eq!(result.node_ids.len(), 100);
+        assert!((result.total_distance - 99.0).abs() < f64::EPSILON);
+        // A* on a 100-node linear graph should complete well under 5ms
+        assert!(
+            elapsed.as_millis() < 5,
+            "pathfinding took {}ms, expected < 5ms",
+            elapsed.as_millis()
+        );
+    }
+
+    #[test]
+    fn test_find_path_large_graph_with_shortcut() {
+        // 100-node graph with a shortcut from node 0 directly to node 99
+        let node_ids: Vec<Uuid> = (0..100).map(|_| Uuid::new_v4()).collect();
+
+        let mut graph = Graph::new();
+        let mut positions = HashMap::new();
+
+        for (i, &id) in node_ids.iter().enumerate() {
+            graph.add_node(id);
+            positions.insert(id, (i as f64, 0.0, 0.0));
+        }
+
+        for i in 0..99 {
+            graph.add_edge(node_ids[i], node_ids[i + 1], 1.0);
+        }
+        // Add a direct shortcut with cost 50 (cheaper than 99 hops)
+        graph.add_edge(node_ids[0], node_ids[99], 50.0);
+
+        let result = find_path(&graph, node_ids[0], node_ids[99], &positions).unwrap();
+        // Should take the shortcut (cost 50 < 99)
+        assert_eq!(result.node_ids, vec![node_ids[0], node_ids[99]]);
+        assert!((result.total_distance - 50.0).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn test_find_path_node_not_in_graph() {
+        let mut graph = Graph::new();
+        let a = Uuid::new_v4();
+        let missing = Uuid::new_v4();
+
+        graph.add_node(a);
+
+        let mut positions = HashMap::new();
+        positions.insert(a, (0.0, 0.0, 0.0));
+        positions.insert(missing, (1.0, 0.0, 0.0));
+
+        // Goal not in graph
+        assert!(find_path(&graph, a, missing, &positions).is_none());
+        // Start not in graph
+        assert!(find_path(&graph, missing, a, &positions).is_none());
+    }
+
+    #[test]
+    fn test_find_path_diamond_graph() {
+        // Diamond: A -> B, A -> C, B -> D, C -> D
+        // B path costs 3, C path costs 5 => should pick B
+        let mut graph = Graph::new();
+        let a = Uuid::new_v4();
+        let b = Uuid::new_v4();
+        let c = Uuid::new_v4();
+        let d = Uuid::new_v4();
+
+        graph.add_node(a);
+        graph.add_node(b);
+        graph.add_node(c);
+        graph.add_node(d);
+
+        graph.add_edge(a, b, 1.0);
+        graph.add_edge(a, c, 3.0);
+        graph.add_edge(b, d, 2.0);
+        graph.add_edge(c, d, 2.0);
+
+        let mut positions = HashMap::new();
+        positions.insert(a, (0.0, 0.0, 0.0));
+        positions.insert(b, (1.0, 1.0, 0.0));
+        positions.insert(c, (1.0, -1.0, 0.0));
+        positions.insert(d, (2.0, 0.0, 0.0));
+
+        let result = find_path(&graph, a, d, &positions).unwrap();
+        assert_eq!(result.node_ids, vec![a, b, d]);
+        assert!((result.total_distance - 3.0).abs() < f64::EPSILON);
+    }
 }

@@ -1,12 +1,9 @@
 use tokio::signal;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
-mod api;
-mod config;
-mod db;
-mod error;
-mod grpc;
-mod services;
+use amr_backend::api;
+use amr_backend::config;
+use amr_backend::db;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
