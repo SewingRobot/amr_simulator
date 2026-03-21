@@ -1,0 +1,51 @@
+# Build artifacts
+target/
+dist/
+build/
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment
+.env
+.env.local
+*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data (real data never in git)
+data/
+*.las
+*.laz
+*.ply
+*.pcd
+
+# Large binaries
+*.glb
+*.gltf
+*.usd
+*.usda
+*.usdc
+*.stl
+*.dae
+
+# Generated code
+**/generated/
+**/proto_gen/
+
+# Test fixtures (large)
+test-data/fixtures/m/
+test-data/fixtures/l/
+test-data/fixtures/xl/
+
+# Claude Code local settings
+.claude/settings.local.json
