@@ -128,8 +128,9 @@ export class WebSocketManager {
       }
     }
 
-    this.ws.onerror = (error) => {
-      console.error('[WS] Error:', error)
+    this.ws.onerror = () => {
+      // Silently handle — reconnection is managed by onclose
+      console.debug('[WS] Connection error, will retry...')
     }
   }
 
