@@ -1,5 +1,6 @@
 #include "core/simulation.h"
 #include "physics/backend_factory.h"
+#include "physics/custom_backend.h"
 #include "sensors/lidar_2d.h"
 
 #include <spdlog/spdlog.h>
@@ -25,6 +26,13 @@ Simulation::~Simulation() {
 void Simulation::loadWorld(const std::string& path) {
     spdlog::info("Loading world from '{}'", path);
     world_.loadFromFile(path);
+
+    // Set world bounds on physics backend for wall clamping
+    auto* custom = dynamic_cast<CustomLightweightBackend*>(physics_.get());
+    if (custom && world_.getWidth() > 0 && world_.getHeight() > 0) {
+        custom->setWorldBounds(world_.getWidth(), world_.getHeight());
+        spdlog::info("Physics bounds set to {}x{}", world_.getWidth(), world_.getHeight());
+    }
 }
 
 uint64_t Simulation::spawnRobot(double x, double y, double theta) {

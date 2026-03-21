@@ -34,6 +34,7 @@ void CustomLightweightBackend::step(double dt) {
         body.pose.y += v * std::sin(body.pose.theta) * dt;
     }
 
+    clampToBounds();
     detectCollisions();
 }
 
@@ -108,6 +109,31 @@ void CustomLightweightBackend::detectCollisions() {
             if (dist_sq < min_dist * min_dist) {
                 collisions_.push_back({{ids[i]}, {ids[j]}});
             }
+        }
+    }
+}
+
+void CustomLightweightBackend::clampToBounds() {
+    if (!m_hasBounds) return;
+
+    for (auto& [id, body] : bodies_) {
+        double r = body.radius;
+        // Clamp position within world bounds
+        if (body.pose.x - r < 0.0) {
+            body.pose.x = r;
+            body.velocity.linear = 0.0;
+        }
+        if (body.pose.x + r > m_worldWidth) {
+            body.pose.x = m_worldWidth - r;
+            body.velocity.linear = 0.0;
+        }
+        if (body.pose.y - r < 0.0) {
+            body.pose.y = r;
+            body.velocity.linear = 0.0;
+        }
+        if (body.pose.y + r > m_worldHeight) {
+            body.pose.y = m_worldHeight - r;
+            body.velocity.linear = 0.0;
         }
     }
 }

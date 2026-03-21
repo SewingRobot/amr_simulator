@@ -196,13 +196,13 @@ export class WebSocketManager {
   unsubscribe(topic: string): void {
     this.topics.delete(topic)
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      this.ws.send(JSON.stringify({ action: 'unsubscribe', topic }))
+      this.ws.send(JSON.stringify({ type: 'unsubscribe', topic }))
     }
   }
 
   private sendSubscribe(topic: string): void {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      this.ws.send(JSON.stringify({ action: 'subscribe', topic }))
+      this.ws.send(JSON.stringify({ type: 'subscribe', topic }))
     }
   }
 
