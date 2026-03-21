@@ -53,17 +53,20 @@ impl SimEngineClient {
                 continue;
             }
 
-            match serde_json::from_str::<TelemetryMessage>(&line) {
-                Ok(msg) => {
-                    tracing::trace!(
-                        robot_id = %msg.robot_id,
-                        "Received telemetry"
-                    );
-                    // send returns Err only when there are no receivers; that's fine
-                    let _ = tx.send(msg);
+            // Sim engine sends JSON array of telemetry messages per line
+            match serde_json::from_str::<Vec<TelemetryMessage>>(&line) {
+                Ok(msgs) => {
+                    for msg in msgs {
+                        tracing::trace!(robot_id = %msg.robot_id, "Received telemetry");
+                        let _ = tx.send(msg);
+                    }
                 }
-                Err(e) => {
-                    tracing::warn!("Failed to parse telemetry JSON: {}", e);
+                Err(_) => {
+                    // Try parsing as single message (fallback)
+                    if let Ok(msg) = serde_json::from_str::<TelemetryMessage>(&line) {
+                        let _ = tx.send(msg);
+                    }
+                    // Silently skip empty arrays or unparseable lines
                 }
             }
         }

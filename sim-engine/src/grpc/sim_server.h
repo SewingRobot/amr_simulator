@@ -4,6 +4,8 @@
 #include "grpc/command_server.h"
 
 #include <memory>
+#include <string>
+#include <unordered_map>
 
 namespace amr::sim {
 
@@ -37,6 +39,7 @@ private:
     TelemetryServer m_telemetry;
     CommandServer   m_command;
     Simulation&     m_sim;
+    std::unordered_map<std::string, uint64_t> m_robotIdMap;  // string ID → internal ID
 };
 
 }  // namespace amr::sim

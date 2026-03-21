@@ -65,7 +65,7 @@ pub async fn ws_handler(
                 );
             }
             Err(e) => {
-                tracing::warn!("WebSocket auth failed: {}", e);
+                tracing::debug!("WebSocket auth skipped: {}", e);
             }
         }
     }
@@ -150,10 +150,8 @@ async fn handle_socket(
                 match result {
                     Ok(msg) => {
                         if should_forward(&subscriptions, &msg) {
-                            let topic = format!("telemetry:{}", msg.robot_id);
-                            let data = serde_json::to_value(&msg).unwrap();
-                            let server_msg = WsServerMessage::Telemetry { topic, data };
-                            let text = serde_json::to_string(&server_msg).unwrap();
+                            let envelope = msg.to_ws_envelope();
+                            let text = serde_json::to_string(&envelope).unwrap();
                             if socket.send(Message::Text(text.into())).await.is_err() {
                                 break;
                             }

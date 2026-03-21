@@ -33,6 +33,15 @@ void SimServer::stop() {
 
 void SimServer::broadcastCurrentTelemetry() {
     auto telemetry = m_sim.getTelemetry();
+    // Map internal IDs back to string IDs
+    for (auto& t : telemetry) {
+        for (const auto& [str_id, internal_id] : m_robotIdMap) {
+            if (std::to_string(internal_id) == t.robot_id) {
+                t.robot_id = str_id;
+                break;
+            }
+        }
+    }
     m_telemetry.broadcastTelemetry(telemetry);
 }
 
@@ -40,21 +49,33 @@ std::string SimServer::handleCommand(const SimCommand& cmd) {
     nlohmann::json resp;
 
     if (cmd.type == "spawn_robot") {
-        uint64_t id = m_sim.spawnRobot(cmd.x, cmd.y, cmd.theta);
+        uint64_t internal_id = m_sim.spawnRobot(cmd.x, cmd.y, cmd.theta);
+        std::string str_id = cmd.robot_id.empty() ? std::to_string(internal_id) : cmd.robot_id;
+        m_robotIdMap[str_id] = internal_id;
         resp["success"] = true;
-        resp["robot_id"] = std::to_string(id);
+        resp["robot_id"] = str_id;
+        resp["internal_id"] = internal_id;
 
     } else if (cmd.type == "remove_robot") {
-        uint64_t id = 0;
-        try { id = std::stoull(cmd.robot_id); } catch (...) {}
-        m_sim.removeRobot(id);
-        resp["success"] = true;
+        auto it = m_robotIdMap.find(cmd.robot_id);
+        if (it != m_robotIdMap.end()) {
+            m_sim.removeRobot(it->second);
+            m_robotIdMap.erase(it);
+            resp["success"] = true;
+        } else {
+            resp["success"] = false;
+            resp["error"] = "robot not found: " + cmd.robot_id;
+        }
 
     } else if (cmd.type == "send_command") {
-        uint64_t id = 0;
-        try { id = std::stoull(cmd.robot_id); } catch (...) {}
-        m_sim.sendCommand(id, cmd.linear, cmd.angular);
-        resp["success"] = true;
+        auto it = m_robotIdMap.find(cmd.robot_id);
+        if (it != m_robotIdMap.end()) {
+            m_sim.sendCommand(it->second, cmd.linear, cmd.angular);
+            resp["success"] = true;
+        } else {
+            resp["success"] = false;
+            resp["error"] = "robot not found: " + cmd.robot_id;
+        }
 
     } else if (cmd.type == "start_sim") {
         m_sim.startAsync();
