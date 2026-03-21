@@ -6,6 +6,7 @@ import {
 } from 'three'
 import type { Group } from 'three'
 import { enuToThreeJS, enuQuaternionToThreeJS } from '../../utils/math'
+import { useModelLoader } from '../../hooks/useModelLoader'
 import type { Pose } from '../../types/robot'
 
 interface RobotModelProps {
@@ -13,6 +14,7 @@ interface RobotModelProps {
   selected?: boolean
   color?: string
   name?: string
+  modelId?: string
   onClick?: () => void
 }
 
@@ -21,8 +23,10 @@ export function RobotModel({
   selected = false,
   color = '#3b82f6',
   name,
+  modelId,
   onClick,
 }: RobotModelProps) {
+  const { scene: gltfScene } = useModelLoader(modelId)
   const groupRef = useRef<Group>(null)
   const targetPos = useRef(new ThreeVector3())
   const targetQuat = useRef(new ThreeQuaternion())
@@ -58,21 +62,28 @@ export function RobotModel({
 
   return (
     <group ref={groupRef} onClick={onClick}>
-      {/* Robot body: 0.5m x 0.3m x 0.2m */}
-      <mesh>
-        <boxGeometry args={[0.5, 0.2, 0.3]} />
-        <meshStandardMaterial
-          color={selected ? '#facc15' : color}
-          emissive={selected ? '#facc15' : '#000000'}
-          emissiveIntensity={selected ? 0.3 : 0}
-        />
-      </mesh>
+      {/* Use glTF model if loaded, otherwise fallback to box */}
+      {gltfScene ? (
+        <primitive object={gltfScene.clone()} />
+      ) : (
+        <>
+          {/* Robot body: 0.5m x 0.3m x 0.2m */}
+          <mesh>
+            <boxGeometry args={[0.5, 0.2, 0.3]} />
+            <meshStandardMaterial
+              color={selected ? '#facc15' : color}
+              emissive={selected ? '#facc15' : '#000000'}
+              emissiveIntensity={selected ? 0.3 : 0}
+            />
+          </mesh>
 
-      {/* Direction arrow (cone at front) */}
-      <mesh position={[0.35, 0.05, 0]} rotation={[0, 0, -Math.PI / 2]}>
-        <coneGeometry args={[0.06, 0.15, 8]} />
-        <meshStandardMaterial color="#ef4444" />
-      </mesh>
+          {/* Direction arrow (cone at front) */}
+          <mesh position={[0.35, 0.05, 0]} rotation={[0, 0, -Math.PI / 2]}>
+            <coneGeometry args={[0.06, 0.15, 8]} />
+            <meshStandardMaterial color="#ef4444" />
+          </mesh>
+        </>
+      )}
 
       {/* Selection ring */}
       {selected && (

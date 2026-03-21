@@ -7,7 +7,7 @@ use tower_http::cors::{Any, CorsLayer};
 use tower_http::trace::TraceLayer;
 
 use super::AppState;
-use super::handlers::{auth, maps, robots, sim};
+use super::handlers::{assets, auth, maps, robots, sim, tiles};
 use super::middleware::auth::auth_middleware;
 use super::ws::handler::ws_handler;
 
@@ -20,7 +20,9 @@ pub fn create_router(state: AppState) -> Router {
     // Public routes (no auth required)
     let public_routes = Router::new()
         .route("/api/health", get(health_check))
-        .route("/api/auth/login", post(auth::login));
+        .route("/api/auth/login", post(auth::login))
+        .route("/api/assets", get(assets::list_assets))
+        .route("/api/assets/{id}/download", get(assets::download_asset));
 
     // Protected routes (auth required)
     let protected_routes = Router::new()
@@ -40,6 +42,8 @@ pub fn create_router(state: AppState) -> Router {
                 .delete(maps::delete_map),
         )
         .route("/api/sim/command", post(sim::send_command))
+        .route("/api/maps/{map_id}/tiles/{node_id}", get(tiles::get_tile))
+        .route("/api/maps/{map_id}/roadmap", get(tiles::get_roadmap))
         .layer(axum_middleware::from_fn_with_state(
             state.clone(),
             auth_middleware,
