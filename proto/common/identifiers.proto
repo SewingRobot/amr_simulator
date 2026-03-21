@@ -1,0 +1,73 @@
+// proto/common/identifiers.proto
+//
+// UUID-based identifier wrapper types.
+// All IDs are lowercase hex strings in UUID v4 format.
+// Example: "550e8400-e29b-41d4-a716-446655440000"
+
+syntax = "proto3";
+package amr.v1.common;
+
+// Robot identifier.
+message RobotId {
+  string value = 1;  // UUID v4 string
+}
+
+// Map identifier.
+message MapId {
+  string value = 1;  // UUID v4 string
+}
+
+// Asset identifier.
+message AssetId {
+  string value = 1;  // UUID v4 string
+}
+
+// Mission identifier.
+message MissionId {
+  string value = 1;  // UUID v4 string
+}
+
+// Scenario identifier.
+message ScenarioId {
+  string value = 1;  // UUID v4 string
+}
+
+// Simulation session identifier.
+message SimSessionId {
+  string value = 1;  // UUID v4 string
+}
+
+// Roadmap identifier.
+message RoadmapId {
+  string value = 1;  // UUID v4 string
+}
+
+// Roadmap node identifier.
+message NodeId {
+  string value = 1;  // UUID v4 string
+}
+
+// Roadmap edge identifier.
+message EdgeId {
+  string value = 1;  // UUID v4 string
+}
+
+// Semantic region identifier.
+message RegionId {
+  string value = 1;  // UUID v4 string
+}
+
+// User identifier.
+message UserId {
+  string value = 1;  // UUID v4 string
+}
+
+// Plugin identifier.
+message PluginId {
+  string value = 1;  // UUID v4 string
+}
+
+// Conversion job identifier.
+message ConversionJobId {
+  string value = 1;  // UUID v4 string
+}

@@ -1,0 +1,75 @@
+// proto/common/geometry.proto
+//
+// Common geometry type definitions.
+// All coordinates use ENU (East-North-Up) coordinate system, meters, and radians.
+// Quaternions follow Hamilton convention (x, y, z, w).
+
+syntax = "proto3";
+package amr.v1.common;
+
+// 3D vector. Used for positions, velocities, accelerations, etc.
+message Vector3 {
+  double x = 1;  // East direction (meters or m/s)
+  double y = 2;  // North direction
+  double z = 3;  // Up direction
+}
+
+// Quaternion rotation representation. Hamilton convention (x, y, z, w).
+// Must be a unit quaternion: x^2 + y^2 + z^2 + w^2 = 1.
+message Quaternion {
+  double x = 1;
+  double y = 2;
+  double z = 3;
+  double w = 4;  // scalar part
+}
+
+// 3D pose (position + orientation).
+message Pose3D {
+  Vector3 position = 1;       // position (meters)
+  Quaternion orientation = 2; // orientation (unit quaternion)
+}
+
+// 2D pose (planar position + heading angle).
+// Used to simply represent a robot's pose on the floor plane (XY plane).
+message Pose2D {
+  double x = 1;      // East position (meters)
+  double y = 2;      // North position (meters)
+  double theta = 3;  // heading angle (radians, counter-clockwise positive, from East axis)
+}
+
+// Twist representing linear and angular velocities.
+message Twist {
+  Vector3 linear = 1;   // linear velocity (m/s)
+  Vector3 angular = 2;  // angular velocity (rad/s)
+}
+
+// Axis-Aligned Bounding Box (AABB).
+message BoundingBox {
+  Vector3 min = 1;  // minimum corner (x_min, y_min, z_min)
+  Vector3 max = 2;  // maximum corner (x_max, y_max, z_max)
+}
+
+// Rigid body transform (Translation + Rotation).
+message Transform {
+  Vector3 translation = 1;    // translation (meters)
+  Quaternion rotation = 2;    // rotation (unit quaternion)
+}
+
+// 2D polygon. Used for semantic region boundaries, etc.
+message Polygon2D {
+  repeated Point2D vertices = 1;  // vertex list (minimum 3, clockwise)
+}
+
+// 2D point.
+message Point2D {
+  double x = 1;  // East (meters)
+  double y = 2;  // North (meters)
+}
+
+// Color (for visualization).
+message Color {
+  float r = 1;  // Red [0.0, 1.0]
+  float g = 2;  // Green [0.0, 1.0]
+  float b = 3;  // Blue [0.0, 1.0]
+  float a = 4;  // Alpha [0.0, 1.0]
+}

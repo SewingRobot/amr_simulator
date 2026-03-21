@@ -1,0 +1,362 @@
+// proto/map/map_service.proto
+//
+// Map manager gRPC service definition.
+// Backend (Team 2) and Sim Engine (Team 3) are clients of this service.
+
+syntax = "proto3";
+package amr.v1.map;
+
+import "common/identifiers.proto";
+import "map/map_types.proto";
+
+service MapService {
+  // === Map CRUD ===
+
+  // Register map metadata (pre-upload step for point cloud).
+  rpc CreateMap(CreateMapRequest) returns (CreateMapResponse);
+
+  // Get map info.
+  rpc GetMap(GetMapRequest) returns (MapDescriptor);
+
+  // List maps.
+  rpc ListMaps(ListMapsRequest) returns (ListMapsResponse);
+
+  // Update map metadata.
+  rpc UpdateMap(UpdateMapRequest) returns (MapDescriptor);
+
+  // Delete a map.
+  rpc DeleteMap(DeleteMapRequest) returns (DeleteMapResponse);
+
+  // === Point Cloud Upload/Processing ===
+
+  // Get a presigned URL for point cloud upload.
+  rpc GetUploadUrl(GetMapUploadUrlRequest) returns (GetMapUploadUrlResponse);
+
+  // Notify upload completion (starts Potree tiling).
+  rpc CompleteUpload(CompleteMapUploadRequest) returns (CompleteMapUploadResponse);
+
+  // Get processing status.
+  rpc GetProcessingStatus(GetProcessingStatusRequest) returns (GetProcessingStatusResponse);
+
+  // === Tile Serving ===
+
+  // Get a Potree tile.
+  rpc GetTile(GetTileRequest) returns (TileData);
+
+  // Stream multiple tiles (used by Sim Engine for map loading).
+  rpc StreamTiles(StreamTilesRequest) returns (stream TileData);
+
+  // Get Potree metadata.
+  rpc GetPotreeMetadata(GetPotreeMetadataRequest) returns (PotreeMetadata);
+
+  // === Roadmap Management ===
+
+  // Create a roadmap.
+  rpc CreateRoadmap(CreateRoadmapRequest) returns (Roadmap);
+
+  // Get a roadmap.
+  rpc GetRoadmap(GetRoadmapRequest) returns (Roadmap);
+
+  // List roadmaps associated with a map.
+  rpc ListRoadmaps(ListRoadmapsRequest) returns (ListRoadmapsResponse);
+
+  // Update a roadmap (full replacement).
+  rpc UpdateRoadmap(UpdateRoadmapRequest) returns (Roadmap);
+
+  // Delete a roadmap.
+  rpc DeleteRoadmap(DeleteRoadmapRequest) returns (DeleteRoadmapResponse);
+
+  // === Roadmap Node/Edge Individual Management ===
+
+  // Add a node.
+  rpc AddNode(AddNodeRequest) returns (RoadmapNode);
+
+  // Update a node.
+  rpc UpdateNode(UpdateNodeRequest) returns (RoadmapNode);
+
+  // Remove a node (also removes connected edges).
+  rpc RemoveNode(RemoveNodeRequest) returns (RemoveNodeResponse);
+
+  // Add an edge.
+  rpc AddEdge(AddEdgeRequest) returns (RoadmapEdge);
+
+  // Update an edge.
+  rpc UpdateEdge(UpdateEdgeRequest) returns (RoadmapEdge);
+
+  // Remove an edge.
+  rpc RemoveEdge(RemoveEdgeRequest) returns (RemoveEdgeResponse);
+
+  // === Semantic Region Management ===
+
+  // Create a region.
+  rpc CreateRegion(CreateRegionRequest) returns (SemanticRegion);
+
+  // Get a region.
+  rpc GetRegion(GetRegionRequest) returns (SemanticRegion);
+
+  // List regions for a map.
+  rpc ListRegions(ListRegionsRequest) returns (ListRegionsResponse);
+
+  // Update a region.
+  rpc UpdateRegion(UpdateRegionRequest) returns (SemanticRegion);
+
+  // Delete a region.
+  rpc DeleteRegion(DeleteRegionRequest) returns (DeleteRegionResponse);
+
+  // === Pathfinding ===
+
+  // Find shortest path between two nodes.
+  rpc FindPath(PathfindingRequest) returns (PathfindingResult);
+
+  // === Spatial Queries ===
+
+  // Find the nearest node(s) to a coordinate.
+  rpc FindNearestNode(FindNearestNodeRequest) returns (FindNearestNodeResponse);
+
+  // Find which regions contain a point.
+  rpc GetRegionsAtPoint(GetRegionsAtPointRequest) returns (GetRegionsAtPointResponse);
+}
+
+// --- Request/Response messages ---
+
+message CreateMapRequest {
+  string name = 1;
+  string description = 2;
+  MapSourceFormat source_format = 3;
+  string original_filename = 4;
+  uint64 file_size_bytes = 5;
+  string coordinate_system = 6;
+  amr.v1.common.Vector3 origin_offset = 7;
+  repeated string tags = 8;
+}
+
+message CreateMapResponse {
+  MapDescriptor map = 1;
+  string upload_url = 2;
+}
+
+message GetMapRequest {
+  amr.v1.common.MapId map_id = 1;
+}
+
+message ListMapsRequest {
+  uint32 page_size = 1;
+  string page_token = 2;
+  MapStatus status_filter = 3;
+  string search_query = 4;
+  string sort_by = 5;
+  bool sort_descending = 6;
+}
+
+message ListMapsResponse {
+  repeated MapDescriptor maps = 1;
+  string next_page_token = 2;
+  uint32 total_count = 3;
+}
+
+message UpdateMapRequest {
+  amr.v1.common.MapId map_id = 1;
+  optional string name = 2;
+  optional string description = 3;
+  repeated string tags = 4;
+  bool replace_tags = 5;
+  optional double ground_plane_z = 6;
+}
+
+message DeleteMapRequest {
+  amr.v1.common.MapId map_id = 1;
+  bool permanent = 2;
+}
+
+message DeleteMapResponse {
+  bool success = 1;
+}
+
+message GetMapUploadUrlRequest {
+  amr.v1.common.MapId map_id = 1;
+  string content_type = 2;
+}
+
+message GetMapUploadUrlResponse {
+  string upload_url = 1;
+  int64 expires_at_ms = 2;
+}
+
+message CompleteMapUploadRequest {
+  amr.v1.common.MapId map_id = 1;
+  string checksum_sha256 = 2;
+}
+
+message CompleteMapUploadResponse {
+  MapDescriptor map = 1;
+}
+
+message GetProcessingStatusRequest {
+  amr.v1.common.MapId map_id = 1;
+}
+
+message GetProcessingStatusResponse {
+  MapStatus status = 1;
+  double progress = 2;
+  string error_message = 3;
+  ProcessingStats stats = 4;
+}
+
+message ProcessingStats {
+  uint64 points_processed = 1;
+  uint64 total_points = 2;
+  uint32 tiles_generated = 3;
+  double elapsed_seconds = 4;
+}
+
+message GetTileRequest {
+  amr.v1.common.MapId map_id = 1;
+  string node_name = 2;
+}
+
+message StreamTilesRequest {
+  amr.v1.common.MapId map_id = 1;
+  uint32 max_level = 2;               // max LOD level (0 = all)
+  amr.v1.common.BoundingBox bounds = 3; // bounds filter (empty = all)
+}
+
+message GetPotreeMetadataRequest {
+  amr.v1.common.MapId map_id = 1;
+}
+
+message CreateRoadmapRequest {
+  amr.v1.common.MapId map_id = 1;
+  string name = 2;
+  string description = 3;
+  repeated RoadmapNode nodes = 4;      // initial nodes (optional)
+  repeated RoadmapEdge edges = 5;      // initial edges (optional)
+}
+
+message GetRoadmapRequest {
+  amr.v1.common.RoadmapId roadmap_id = 1;
+}
+
+message ListRoadmapsRequest {
+  amr.v1.common.MapId map_id = 1;
+  uint32 page_size = 2;
+  string page_token = 3;
+}
+
+message ListRoadmapsResponse {
+  repeated Roadmap roadmaps = 1;
+  string next_page_token = 2;
+}
+
+message UpdateRoadmapRequest {
+  amr.v1.common.RoadmapId roadmap_id = 1;
+  optional string name = 2;
+  optional string description = 3;
+  repeated RoadmapNode nodes = 4;
+  repeated RoadmapEdge edges = 5;
+}
+
+message DeleteRoadmapRequest {
+  amr.v1.common.RoadmapId roadmap_id = 1;
+}
+
+message DeleteRoadmapResponse {
+  bool success = 1;
+}
+
+message AddNodeRequest {
+  amr.v1.common.RoadmapId roadmap_id = 1;
+  RoadmapNode node = 2;
+}
+
+message UpdateNodeRequest {
+  amr.v1.common.RoadmapId roadmap_id = 1;
+  RoadmapNode node = 2;
+}
+
+message RemoveNodeRequest {
+  amr.v1.common.RoadmapId roadmap_id = 1;
+  amr.v1.common.NodeId node_id = 2;
+}
+
+message RemoveNodeResponse {
+  bool success = 1;
+  repeated amr.v1.common.EdgeId removed_edge_ids = 2; // edges removed along with the node
+}
+
+message AddEdgeRequest {
+  amr.v1.common.RoadmapId roadmap_id = 1;
+  RoadmapEdge edge = 2;
+}
+
+message UpdateEdgeRequest {
+  amr.v1.common.RoadmapId roadmap_id = 1;
+  RoadmapEdge edge = 2;
+}
+
+message RemoveEdgeRequest {
+  amr.v1.common.RoadmapId roadmap_id = 1;
+  amr.v1.common.EdgeId edge_id = 2;
+}
+
+message RemoveEdgeResponse {
+  bool success = 1;
+}
+
+message CreateRegionRequest {
+  amr.v1.common.MapId map_id = 1;
+  SemanticRegion region = 2;
+}
+
+message GetRegionRequest {
+  amr.v1.common.RegionId region_id = 1;
+}
+
+message ListRegionsRequest {
+  amr.v1.common.MapId map_id = 1;
+  RegionType type_filter = 2;
+  uint32 page_size = 3;
+  string page_token = 4;
+}
+
+message ListRegionsResponse {
+  repeated SemanticRegion regions = 1;
+  string next_page_token = 2;
+  uint32 total_count = 3;
+}
+
+message UpdateRegionRequest {
+  SemanticRegion region = 1;
+}
+
+message DeleteRegionRequest {
+  amr.v1.common.RegionId region_id = 1;
+}
+
+message DeleteRegionResponse {
+  bool success = 1;
+}
+
+message FindNearestNodeRequest {
+  amr.v1.common.RoadmapId roadmap_id = 1;
+  amr.v1.common.Point2D point = 2;
+  double max_distance = 3;           // max search radius (meters, 0 = unlimited)
+  uint32 limit = 4;                   // result count (default 1)
+}
+
+message FindNearestNodeResponse {
+  repeated NearestNodeResult results = 1;
+}
+
+message NearestNodeResult {
+  RoadmapNode node = 1;
+  double distance = 2;               // distance (meters)
+}
+
+message GetRegionsAtPointRequest {
+  amr.v1.common.MapId map_id = 1;
+  amr.v1.common.Point2D point = 2;
+}
+
+message GetRegionsAtPointResponse {
+  repeated SemanticRegion regions = 1;
+}

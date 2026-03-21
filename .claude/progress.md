@@ -8,7 +8,7 @@
 **Phase 1: Prototype** (Week 1-8)
 
 ## Current Week
-**Week 0** (Pre-development — planning complete)
+**Week 1** (Development started)
 
 ---
 

@@ -1,0 +1,166 @@
+// proto/common/telemetry.proto
+//
+// Robot telemetry and sensor data definitions.
+// Sim Engine produces telemetry, Backend relays it to Frontend.
+
+syntax = "proto3";
+package amr.v1.common;
+
+import "common/geometry.proto";
+import "common/identifiers.proto";
+
+// Robot operation mode.
+enum OperationMode {
+  OPERATION_MODE_UNSPECIFIED = 0;
+  OPERATION_MODE_AUTOMATIC = 1;    // autonomous driving mode
+  OPERATION_MODE_SEMI_AUTOMATIC = 2; // semi-automatic mode
+  OPERATION_MODE_MANUAL = 3;       // manual (remote) control mode
+  OPERATION_MODE_SERVICE = 4;      // service/maintenance mode
+  OPERATION_MODE_TEACH_IN = 5;     // path learning mode
+}
+
+// Robot connection status.
+enum ConnectionStatus {
+  CONNECTION_STATUS_UNSPECIFIED = 0;
+  CONNECTION_STATUS_ONLINE = 1;
+  CONNECTION_STATUS_OFFLINE = 2;
+  CONNECTION_STATUS_CONNECTION_BROKEN = 3;
+}
+
+// Battery status.
+message BatteryStatus {
+  double charge_percentage = 1;    // charge ratio (0.0 ~ 100.0)
+  double voltage = 2;              // voltage (V)
+  double current = 3;              // current (A)
+  double temperature = 4;          // temperature (degrees C)
+  bool is_charging = 5;            // whether charging
+  uint32 estimated_minutes_remaining = 6; // estimated remaining time (minutes)
+}
+
+// Safety state.
+message SafetyState {
+  EStopStatus e_stop = 1;
+  bool field_violation = 2;           // safety field violation
+  repeated string active_safety_zones = 3; // currently active safety zone IDs
+}
+
+// Emergency stop status.
+enum EStopStatus {
+  E_STOP_STATUS_UNSPECIFIED = 0;
+  E_STOP_STATUS_AUTO_ACK = 1;        // auto-acknowledge
+  E_STOP_STATUS_MANUAL = 2;          // manual e-stop
+  E_STOP_STATUS_REMOTE = 3;          // remote e-stop
+  E_STOP_STATUS_NONE = 4;            // no e-stop
+}
+
+// Individual sensor reading.
+message SensorReading {
+  string sensor_id = 1;              // sensor identifier (e.g., "lidar_front", "imu_0")
+  string sensor_type = 2;            // sensor type (e.g., "lidar", "imu", "camera", "ultrasonic")
+  int64 timestamp_ms = 3;            // measurement time (Unix milliseconds)
+  oneof data {
+    LidarScan lidar_scan = 10;
+    ImuReading imu_reading = 11;
+    UltrasonicReading ultrasonic_reading = 12;
+    EncoderReading encoder_reading = 13;
+  }
+}
+
+// 2D LiDAR scan data.
+message LidarScan {
+  float angle_min = 1;               // minimum angle (radians)
+  float angle_max = 2;               // maximum angle (radians)
+  float angle_increment = 3;         // angle increment (radians)
+  float range_min = 4;               // minimum range (meters)
+  float range_max = 5;               // maximum range (meters)
+  repeated float ranges = 6;         // range array (meters)
+  repeated float intensities = 7;    // intensity array
+}
+
+// IMU sensor data.
+message ImuReading {
+  Vector3 linear_acceleration = 1;   // linear acceleration (m/s^2)
+  Vector3 angular_velocity = 2;      // angular velocity (rad/s)
+  Quaternion orientation = 3;        // orientation (quaternion)
+}
+
+// Ultrasonic sensor data.
+message UltrasonicReading {
+  float range = 1;                   // range (meters)
+  float field_of_view = 2;          // field of view (radians)
+}
+
+// Encoder data.
+message EncoderReading {
+  double position = 1;               // position (radians or meters)
+  double velocity = 2;               // velocity (rad/s or m/s)
+}
+
+// Robot state message (full state snapshot).
+message RobotState {
+  RobotId robot_id = 1;
+  int64 timestamp_ms = 2;            // Unix milliseconds
+  uint64 sequence_number = 3;        // sequence number (ordering and dedup)
+
+  // Position and motion
+  Pose3D pose = 4;                   // current 3D pose
+  Twist velocity = 5;               // current velocity
+  Twist acceleration = 6;           // current acceleration
+
+  // Status info
+  OperationMode operation_mode = 7;
+  ConnectionStatus connection_status = 8;
+  BatteryStatus battery = 9;
+  SafetyState safety = 10;
+
+  // Mission related
+  MissionId current_mission_id = 11; // current mission (empty if none)
+  string current_node_id = 12;       // current node (VDA5050 compatible)
+  bool driving = 13;                 // whether currently driving
+
+  // Errors
+  repeated ErrorInfo errors = 14;
+  repeated ErrorInfo warnings = 15;
+}
+
+// Error/warning info (VDA5050 compatible).
+message ErrorInfo {
+  string error_type = 1;             // error type
+  repeated ErrorReference references = 2; // error references
+  string description = 3;            // error description
+  ErrorLevel level = 4;
+}
+
+enum ErrorLevel {
+  ERROR_LEVEL_UNSPECIFIED = 0;
+  ERROR_LEVEL_WARNING = 1;
+  ERROR_LEVEL_FATAL = 2;
+}
+
+message ErrorReference {
+  string reference_key = 1;          // reference key (e.g., "node_id", "edge_id")
+  string reference_value = 2;        // reference value
+}
+
+// Telemetry message (for streaming, lightweight).
+// Contains only frequently changing fields from RobotState.
+message TelemetryMessage {
+  RobotId robot_id = 1;
+  int64 timestamp_ms = 2;
+  uint64 sequence_number = 3;
+
+  Pose3D pose = 4;
+  Twist velocity = 5;
+
+  double battery_percentage = 6;
+  bool driving = 7;
+
+  repeated ErrorInfo errors = 8;
+}
+
+// Telemetry subscription request.
+message TelemetrySubscription {
+  repeated RobotId robot_ids = 1;    // robot IDs to subscribe (empty = all robots)
+  uint32 rate_hz = 2;                // desired receive rate (Hz, default 10)
+  repeated string fields = 3;        // fields to filter (empty = all fields)
+}

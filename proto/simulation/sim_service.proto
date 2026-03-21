@@ -1,0 +1,220 @@
+// proto/simulation/sim_service.proto
+//
+// Simulation engine gRPC service definition.
+// Backend (Team 2) is the client, Sim Engine (Team 3) is the server.
+
+syntax = "proto3";
+package amr.v1.simulation;
+
+import "common/identifiers.proto";
+import "common/telemetry.proto";
+import "simulation/sim_types.proto";
+
+service SimulationService {
+  // === Session Management ===
+
+  // Create a new simulation session.
+  rpc CreateSession(CreateSessionRequest) returns (CreateSessionResponse);
+
+  // Get existing session info.
+  rpc GetSession(GetSessionRequest) returns (SimSession);
+
+  // List active sessions.
+  rpc ListSessions(ListSessionsRequest) returns (ListSessionsResponse);
+
+  // Delete (terminate) a session.
+  rpc DeleteSession(DeleteSessionRequest) returns (DeleteSessionResponse);
+
+  // === Simulation Control ===
+
+  // Start simulation.
+  rpc Start(StartRequest) returns (StartResponse);
+
+  // Pause simulation.
+  rpc Pause(PauseRequest) returns (PauseResponse);
+
+  // Resume simulation.
+  rpc Resume(ResumeRequest) returns (ResumeResponse);
+
+  // Stop simulation.
+  rpc Stop(StopRequest) returns (StopResponse);
+
+  // Reset simulation (return to initial state).
+  rpc Reset(ResetRequest) returns (ResetResponse);
+
+  // Step simulation by specified duration (for debugging).
+  rpc Step(StepRequest) returns (StepResponse);
+
+  // Change real-time scale factor.
+  rpc SetTimeScale(SetTimeScaleRequest) returns (SetTimeScaleResponse);
+
+  // === Map Management ===
+
+  // Load a map into the simulation world.
+  rpc LoadMap(LoadMapRequest) returns (LoadMapResponse);
+
+  // === Robot Management ===
+
+  // Spawn a robot.
+  rpc SpawnRobot(SpawnRobotRequest) returns (SpawnRobotResponse);
+
+  // Remove a robot.
+  rpc RemoveRobot(RemoveRobotRequest) returns (RemoveRobotResponse);
+
+  // Set robot pose (teleport).
+  rpc SetRobotPose(SetRobotPoseRequest) returns (SetRobotPoseResponse);
+
+  // Send velocity command to a robot (for remote control).
+  rpc SendVelocityCommand(VelocityCommand) returns (VelocityCommandResponse);
+
+  // Set navigation goal for a robot (mission-based movement).
+  rpc SendNavigationGoal(NavigationGoal) returns (NavigationResult);
+
+  // Inject a fault (for testing).
+  rpc InjectFault(InjectFaultRequest) returns (InjectFaultResponse);
+
+  // Clear an injected fault.
+  rpc ClearFault(ClearFaultRequest) returns (ClearFaultResponse);
+
+  // === Streaming ===
+
+  // Subscribe to telemetry stream (Server-streaming).
+  rpc StreamTelemetry(amr.v1.common.TelemetrySubscription) returns (stream amr.v1.common.TelemetryMessage);
+
+  // Stream full robot states for all robots (Server-streaming).
+  rpc StreamRobotStates(StreamRobotStatesRequest) returns (stream amr.v1.common.RobotState);
+
+  // Stream simulation events (Server-streaming).
+  rpc StreamEvents(StreamEventsRequest) returns (stream SimEvent);
+
+  // === Scenarios ===
+
+  // Load and run a scenario.
+  rpc RunScenario(RunScenarioRequest) returns (RunScenarioResponse);
+}
+
+// --- Request/Response messages ---
+
+message CreateSessionRequest {
+  SimConfig config = 1;
+  string name = 2;                    // session name (optional)
+}
+
+message CreateSessionResponse {
+  amr.v1.common.SimSessionId session_id = 1;
+  SimSession session = 2;
+}
+
+message GetSessionRequest {
+  amr.v1.common.SimSessionId session_id = 1;
+}
+
+message ListSessionsRequest {
+  uint32 page_size = 1;
+  string page_token = 2;
+}
+
+message ListSessionsResponse {
+  repeated SimSession sessions = 1;
+  string next_page_token = 2;
+}
+
+message DeleteSessionRequest {
+  amr.v1.common.SimSessionId session_id = 1;
+}
+
+message DeleteSessionResponse {
+  bool success = 1;
+}
+
+message StartRequest {
+  amr.v1.common.SimSessionId session_id = 1;
+}
+
+message StartResponse {
+  bool success = 1;
+  string error_message = 2;
+}
+
+message PauseRequest {
+  amr.v1.common.SimSessionId session_id = 1;
+}
+
+message PauseResponse {
+  bool success = 1;
+}
+
+message ResumeRequest {
+  amr.v1.common.SimSessionId session_id = 1;
+}
+
+message ResumeResponse {
+  bool success = 1;
+}
+
+message StopRequest {
+  amr.v1.common.SimSessionId session_id = 1;
+}
+
+message StopResponse {
+  bool success = 1;
+}
+
+message ResetRequest {
+  amr.v1.common.SimSessionId session_id = 1;
+}
+
+message ResetResponse {
+  bool success = 1;
+  SimSession session = 2;
+}
+
+message StepRequest {
+  amr.v1.common.SimSessionId session_id = 1;
+  double duration = 2;                // time to advance (seconds, default: time_step)
+}
+
+message StepResponse {
+  double new_sim_time = 1;
+}
+
+message SetTimeScaleRequest {
+  amr.v1.common.SimSessionId session_id = 1;
+  double real_time_factor = 2;
+}
+
+message SetTimeScaleResponse {
+  bool success = 1;
+}
+
+message VelocityCommandResponse {
+  bool success = 1;
+}
+
+message ClearFaultRequest {
+  string fault_id = 1;
+}
+
+message ClearFaultResponse {
+  bool success = 1;
+}
+
+message StreamRobotStatesRequest {
+  amr.v1.common.SimSessionId session_id = 1;
+  uint32 rate_hz = 2;                // receive rate (default 1)
+}
+
+message StreamEventsRequest {
+  amr.v1.common.SimSessionId session_id = 1;
+  repeated string event_types = 2;   // event type filter (empty = all)
+}
+
+message RunScenarioRequest {
+  amr.v1.common.SimSessionId session_id = 1;
+  ScenarioDefinition scenario = 2;
+}
+
+message RunScenarioResponse {
+  bool success = 1;
+  string error_message = 2;
+}

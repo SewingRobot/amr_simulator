@@ -1,0 +1,227 @@
+// proto/simulation/sim_types.proto
+//
+// Simulation engine related type definitions.
+
+syntax = "proto3";
+package amr.v1.simulation;
+
+import "common/geometry.proto";
+import "common/identifiers.proto";
+import "common/telemetry.proto";
+
+// Simulation configuration.
+message SimConfig {
+  double time_step = 1;               // physics simulation time step (seconds, default 0.001)
+  double real_time_factor = 2;        // speed multiplier relative to real-time (1.0 = real-time, 2.0 = 2x)
+  amr.v1.common.Vector3 gravity = 3;  // gravity vector (default: {0, 0, -9.81})
+  PhysicsEngine physics_engine = 4;
+  uint32 max_robots = 5;              // max robot count (default 100)
+  bool enable_collision = 6;          // enable collision detection (default true)
+  bool enable_sensors = 7;            // enable sensor simulation (default true)
+  uint32 telemetry_rate_hz = 8;       // telemetry send rate (Hz, default 10)
+  RenderConfig render_config = 9;     // render settings (optional)
+}
+
+enum PhysicsEngine {
+  PHYSICS_ENGINE_UNSPECIFIED = 0;
+  PHYSICS_ENGINE_BULLET = 1;          // Bullet Physics
+  PHYSICS_ENGINE_ODE = 2;             // Open Dynamics Engine
+  PHYSICS_ENGINE_SIMPLE_2D = 3;       // Simple 2D physics (performance-first)
+}
+
+// Render configuration (for server-side rendering).
+message RenderConfig {
+  uint32 width = 1;                    // render resolution width
+  uint32 height = 2;                   // render resolution height
+  bool headless = 3;                   // headless mode (default true)
+}
+
+// Simulation session state.
+enum SimSessionState {
+  SIM_SESSION_STATE_UNSPECIFIED = 0;
+  SIM_SESSION_STATE_INITIALIZING = 1;
+  SIM_SESSION_STATE_READY = 2;
+  SIM_SESSION_STATE_RUNNING = 3;
+  SIM_SESSION_STATE_PAUSED = 4;
+  SIM_SESSION_STATE_STOPPED = 5;
+  SIM_SESSION_STATE_ERROR = 6;
+}
+
+// Simulation session information.
+message SimSession {
+  amr.v1.common.SimSessionId id = 1;
+  SimSessionState state = 2;
+  SimConfig config = 3;
+  int64 created_at_ms = 4;           // creation time (Unix milliseconds)
+  double sim_time = 5;               // current simulation time (seconds)
+  double wall_time = 6;              // elapsed wall-clock time (seconds)
+  uint32 robot_count = 7;            // currently spawned robot count
+  amr.v1.common.MapId loaded_map_id = 8; // loaded map ID
+}
+
+// Scenario definition (pre-defined simulation scenario).
+message ScenarioDefinition {
+  amr.v1.common.ScenarioId id = 1;
+  string name = 2;
+  string description = 3;
+  SimConfig config = 4;
+  amr.v1.common.MapId map_id = 5;
+  repeated SpawnRobotRequest initial_robots = 6;  // initial robot placement
+  repeated ScenarioEvent scripted_events = 7;     // scripted events
+}
+
+// Scripted event (triggered at specific simulation time during scenario playback).
+message ScenarioEvent {
+  double trigger_time = 1;            // trigger time (simulation seconds)
+  oneof event {
+    SpawnRobotRequest spawn_robot = 10;
+    RemoveRobotRequest remove_robot = 11;
+    SetRobotPoseRequest set_pose = 12;
+    InjectFaultRequest inject_fault = 13;
+  }
+}
+
+// Robot spawn request.
+message SpawnRobotRequest {
+  amr.v1.common.RobotId robot_id = 1;  // if empty, auto-generated
+  amr.v1.common.AssetId asset_id = 2;  // robot asset (URDF) ID
+  amr.v1.common.Pose3D initial_pose = 3;
+  string robot_name = 4;               // display name (optional)
+  map<string, string> parameters = 5;  // additional parameters
+}
+
+message SpawnRobotResponse {
+  amr.v1.common.RobotId robot_id = 1;
+  bool success = 2;
+  string error_message = 3;
+}
+
+// Robot removal request.
+message RemoveRobotRequest {
+  amr.v1.common.RobotId robot_id = 1;
+}
+
+message RemoveRobotResponse {
+  bool success = 1;
+  string error_message = 2;
+}
+
+// Robot pose set request (teleport).
+message SetRobotPoseRequest {
+  amr.v1.common.RobotId robot_id = 1;
+  amr.v1.common.Pose3D pose = 2;
+}
+
+message SetRobotPoseResponse {
+  bool success = 1;
+}
+
+// Fault injection request (for testing).
+message InjectFaultRequest {
+  amr.v1.common.RobotId robot_id = 1;
+  FaultType fault_type = 2;
+  double duration_seconds = 3;        // 0 means permanent
+  map<string, string> parameters = 4;
+}
+
+enum FaultType {
+  FAULT_TYPE_UNSPECIFIED = 0;
+  FAULT_TYPE_MOTOR_FAILURE = 1;
+  FAULT_TYPE_SENSOR_NOISE = 2;
+  FAULT_TYPE_BATTERY_DRAIN = 3;
+  FAULT_TYPE_COMMUNICATION_LOSS = 4;
+  FAULT_TYPE_WHEEL_SLIP = 5;
+  FAULT_TYPE_OBSTACLE_SPAWN = 6;
+}
+
+message InjectFaultResponse {
+  bool success = 1;
+  string fault_id = 2;
+}
+
+// Velocity command (robot control).
+message VelocityCommand {
+  amr.v1.common.RobotId robot_id = 1;
+  amr.v1.common.Twist velocity = 2;
+}
+
+// Navigation goal (mission-based movement).
+message NavigationGoal {
+  amr.v1.common.RobotId robot_id = 1;
+  amr.v1.common.Pose2D target_pose = 2;
+  repeated amr.v1.common.Pose2D waypoints = 3;  // waypoints (optional)
+  double max_speed = 4;                // max speed (m/s)
+  double goal_tolerance = 5;           // arrival tolerance (meters)
+}
+
+message NavigationResult {
+  amr.v1.common.RobotId robot_id = 1;
+  NavigationStatus status = 2;
+  amr.v1.common.Pose3D final_pose = 3;
+  double distance_traveled = 4;        // distance traveled (meters)
+  double time_elapsed = 5;             // elapsed time (seconds)
+}
+
+enum NavigationStatus {
+  NAVIGATION_STATUS_UNSPECIFIED = 0;
+  NAVIGATION_STATUS_SUCCEEDED = 1;
+  NAVIGATION_STATUS_FAILED = 2;
+  NAVIGATION_STATUS_CANCELLED = 3;
+  NAVIGATION_STATUS_IN_PROGRESS = 4;
+}
+
+// Simulation event (streamed to observers).
+message SimEvent {
+  int64 timestamp_ms = 1;
+  double sim_time = 2;
+  oneof event {
+    RobotSpawned robot_spawned = 10;
+    RobotRemoved robot_removed = 11;
+    CollisionEvent collision = 12;
+    FaultEvent fault = 13;
+    SimStateChanged state_changed = 14;
+    NavigationResult navigation_completed = 15;
+  }
+}
+
+message RobotSpawned {
+  amr.v1.common.RobotId robot_id = 1;
+  amr.v1.common.AssetId asset_id = 2;
+  amr.v1.common.Pose3D pose = 3;
+}
+
+message RobotRemoved {
+  amr.v1.common.RobotId robot_id = 1;
+  string reason = 2;
+}
+
+message CollisionEvent {
+  amr.v1.common.RobotId robot_a = 1;
+  string object_b = 2;               // robot ID or obstacle name
+  amr.v1.common.Vector3 contact_point = 3;
+  double impact_force = 4;           // collision force (N)
+}
+
+message FaultEvent {
+  amr.v1.common.RobotId robot_id = 1;
+  FaultType fault_type = 2;
+  string fault_id = 3;
+  bool active = 4;                    // true=triggered, false=cleared
+}
+
+message SimStateChanged {
+  SimSessionState previous_state = 1;
+  SimSessionState new_state = 2;
+  string reason = 3;
+}
+
+// Map load request/response.
+message LoadMapRequest {
+  amr.v1.common.MapId map_id = 1;
+}
+
+message LoadMapResponse {
+  bool success = 1;
+  string error_message = 2;
+  amr.v1.common.BoundingBox world_bounds = 3;
+}

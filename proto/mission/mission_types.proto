@@ -1,0 +1,215 @@
+// proto/mission/mission_types.proto
+//
+// Mission related type definitions.
+// Missions are managed by Backend and delivered to Sim Engine and real robots.
+// Designed to be compatible with VDA5050 Order messages.
+
+syntax = "proto3";
+package amr.v1.mission;
+
+import "common/identifiers.proto";
+import "common/geometry.proto";
+
+// Mission status.
+enum MissionStatus {
+  MISSION_STATUS_UNSPECIFIED = 0;
+  MISSION_STATUS_DRAFT = 1;          // draft (not yet assigned)
+  MISSION_STATUS_QUEUED = 2;         // added to queue
+  MISSION_STATUS_ASSIGNED = 3;       // assigned to robot
+  MISSION_STATUS_IN_PROGRESS = 4;    // in progress
+  MISSION_STATUS_PAUSED = 5;         // paused
+  MISSION_STATUS_COMPLETED = 6;      // completed
+  MISSION_STATUS_FAILED = 7;         // failed
+  MISSION_STATUS_CANCELLED = 8;      // cancelled
+  MISSION_STATUS_ABORTING = 9;       // aborting
+}
+
+// Mission priority.
+enum MissionPriority {
+  MISSION_PRIORITY_UNSPECIFIED = 0;
+  MISSION_PRIORITY_LOW = 1;
+  MISSION_PRIORITY_NORMAL = 2;
+  MISSION_PRIORITY_HIGH = 3;
+  MISSION_PRIORITY_URGENT = 4;
+  MISSION_PRIORITY_CRITICAL = 5;
+}
+
+// Mission definition.
+message Mission {
+  amr.v1.common.MissionId id = 1;
+  string name = 2;
+  string description = 3;
+
+  MissionStatus status = 4;
+  MissionPriority priority = 5;
+
+  // Assigned robot
+  amr.v1.common.RobotId assigned_robot_id = 6;
+
+  // Map/roadmap reference
+  amr.v1.common.MapId map_id = 7;
+  amr.v1.common.RoadmapId roadmap_id = 8;
+
+  // Mission steps
+  repeated MissionStep steps = 9;
+
+  // Current progress
+  uint32 current_step_index = 10;     // index of currently executing step
+  double progress = 11;               // overall progress (0.0 ~ 1.0)
+
+  // Path info
+  repeated amr.v1.common.NodeId planned_path = 12;
+
+  // Timestamps
+  int64 created_at_ms = 13;
+  int64 started_at_ms = 14;
+  int64 completed_at_ms = 15;
+  int64 updated_at_ms = 16;
+
+  // Owner
+  amr.v1.common.UserId created_by = 17;
+
+  // Error info (when in FAILED state)
+  string failure_reason = 18;
+
+  // Estimated duration (seconds)
+  double estimated_duration = 19;
+  // Actual duration (seconds)
+  double actual_duration = 20;
+
+  // Distance traveled (meters)
+  double total_distance = 21;
+
+  // Retry info
+  uint32 retry_count = 22;
+  uint32 max_retries = 23;
+
+  // Metadata
+  map<string, string> metadata = 24;
+}
+
+// Mission step.
+message MissionStep {
+  string step_id = 1;                  // step ID (unique within mission)
+  uint32 sequence = 2;                // execution order
+
+  StepType step_type = 3;
+  MissionStepStatus status = 4;
+
+  // Destination (for NAVIGATE type)
+  amr.v1.common.NodeId target_node_id = 5;
+  amr.v1.common.Pose2D target_pose = 6;
+
+  // Actions (for ACTION type)
+  repeated MissionAction actions = 7;
+
+  // Wait (for WAIT type)
+  double wait_duration_seconds = 8;   // wait time (seconds, 0 = conditional wait)
+  string wait_condition = 9;          // wait condition expression
+
+  // Timestamps
+  int64 started_at_ms = 10;
+  int64 completed_at_ms = 11;
+
+  // Error info
+  string failure_reason = 12;
+
+  // Description
+  string description = 13;
+}
+
+enum StepType {
+  STEP_TYPE_UNSPECIFIED = 0;
+  STEP_TYPE_NAVIGATE = 1;            // navigate to destination
+  STEP_TYPE_ACTION = 2;              // perform action (load, unload, etc.)
+  STEP_TYPE_WAIT = 3;                // wait
+  STEP_TYPE_CHARGE = 4;             // charge
+}
+
+enum MissionStepStatus {
+  MISSION_STEP_STATUS_UNSPECIFIED = 0;
+  MISSION_STEP_STATUS_PENDING = 1;
+  MISSION_STEP_STATUS_IN_PROGRESS = 2;
+  MISSION_STEP_STATUS_COMPLETED = 3;
+  MISSION_STEP_STATUS_FAILED = 4;
+  MISSION_STEP_STATUS_SKIPPED = 5;
+}
+
+// Mission action (task performed at a node).
+message MissionAction {
+  string action_id = 1;
+  string action_type = 2;            // VDA5050 actionType (e.g., "pick", "drop", "scan", "wait")
+  ActionStatus status = 3;
+  map<string, string> parameters = 4; // action parameters
+  BlockingType blocking_type = 5;
+}
+
+enum ActionStatus {
+  ACTION_STATUS_UNSPECIFIED = 0;
+  ACTION_STATUS_WAITING = 1;
+  ACTION_STATUS_INITIALIZING = 2;
+  ACTION_STATUS_RUNNING = 3;
+  ACTION_STATUS_PAUSED = 4;
+  ACTION_STATUS_FINISHED = 5;
+  ACTION_STATUS_FAILED = 6;
+}
+
+enum BlockingType {
+  BLOCKING_TYPE_UNSPECIFIED = 0;
+  BLOCKING_TYPE_NONE = 1;            // non-blocking (can execute while moving)
+  BLOCKING_TYPE_SOFT = 2;            // soft blocking (start while moving, complete at node)
+  BLOCKING_TYPE_HARD = 3;            // hard blocking (execute after arriving at node)
+}
+
+// Traffic rule.
+message TrafficRule {
+  string rule_id = 1;
+  string name = 2;
+  TrafficRuleType rule_type = 3;
+
+  // Applicable targets
+  repeated amr.v1.common.EdgeId edge_ids = 4;
+  repeated amr.v1.common.RegionId region_ids = 5;
+
+  // Rule parameters
+  uint32 max_robots = 6;              // max concurrent robots
+  double speed_limit = 7;             // speed limit (m/s)
+  DirectionRule direction = 8;
+
+  // Schedule
+  repeated Schedule schedules = 9;
+
+  bool enabled = 10;
+}
+
+enum TrafficRuleType {
+  TRAFFIC_RULE_TYPE_UNSPECIFIED = 0;
+  TRAFFIC_RULE_TYPE_MUTEX_ZONE = 1;   // mutual exclusion zone
+  TRAFFIC_RULE_TYPE_CAPACITY_LIMIT = 2; // capacity limit
+  TRAFFIC_RULE_TYPE_SPEED_LIMIT = 3;  // speed limit
+  TRAFFIC_RULE_TYPE_DIRECTION = 4;    // direction restriction
+  TRAFFIC_RULE_TYPE_PRIORITY = 5;     // priority
+}
+
+enum DirectionRule {
+  DIRECTION_RULE_UNSPECIFIED = 0;
+  DIRECTION_RULE_FORWARD_ONLY = 1;
+  DIRECTION_RULE_REVERSE_ONLY = 2;
+  DIRECTION_RULE_BIDIRECTIONAL = 3;
+}
+
+// Time schedule (independent definition within mission package).
+message Schedule {
+  string cron_expression = 1;
+  bool active = 2;
+}
+
+// Mission update event (for WebSocket streaming).
+message MissionUpdateEvent {
+  amr.v1.common.MissionId mission_id = 1;
+  MissionStatus status = 2;
+  uint32 current_step_index = 3;
+  double progress = 4;
+  string event_description = 5;
+  int64 timestamp_ms = 6;
+}

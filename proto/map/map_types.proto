@@ -1,0 +1,263 @@
+// proto/map/map_types.proto
+//
+// Map management related type definitions.
+// Includes point clouds, Potree tiles, roadmap graphs, and semantic regions.
+
+syntax = "proto3";
+package amr.v1.map;
+
+import "common/identifiers.proto";
+import "common/geometry.proto";
+
+// Map status.
+enum MapStatus {
+  MAP_STATUS_UNSPECIFIED = 0;
+  MAP_STATUS_UPLOADING = 1;           // point cloud uploading
+  MAP_STATUS_PROCESSING = 2;         // Potree tiling in progress
+  MAP_STATUS_READY = 3;              // ready to use
+  MAP_STATUS_ERROR = 4;              // processing error
+  MAP_STATUS_ARCHIVED = 5;           // archived
+}
+
+// Map source format.
+enum MapSourceFormat {
+  MAP_SOURCE_FORMAT_UNSPECIFIED = 0;
+  MAP_SOURCE_FORMAT_PCD = 1;         // Point Cloud Data
+  MAP_SOURCE_FORMAT_LAS = 2;         // LASer file
+  MAP_SOURCE_FORMAT_LAZ = 3;         // Compressed LAS
+  MAP_SOURCE_FORMAT_PLY = 4;         // Polygon File Format
+  MAP_SOURCE_FORMAT_E57 = 5;         // ASTM E57
+  MAP_SOURCE_FORMAT_XYZ = 6;         // ASCII XYZ
+}
+
+// Map descriptor (metadata).
+message MapDescriptor {
+  amr.v1.common.MapId id = 1;
+  string name = 2;
+  string description = 3;
+  MapStatus status = 4;
+
+  // Source info
+  MapSourceFormat source_format = 5;
+  string original_filename = 6;
+  uint64 file_size_bytes = 7;
+
+  // Spatial info
+  amr.v1.common.BoundingBox bounding_box = 8;  // map bounds
+  uint64 point_count = 9;             // number of points
+  double resolution = 10;             // average point resolution (meters)
+
+  // Potree tile info
+  PotreeMetadata potree = 11;
+
+  // Associated roadmaps
+  repeated amr.v1.common.RoadmapId roadmap_ids = 12;
+
+  // Semantic regions
+  repeated amr.v1.common.RegionId region_ids = 13;
+
+  // Timestamps
+  int64 created_at_ms = 14;
+  int64 updated_at_ms = 15;
+
+  // Coordinate system info
+  string coordinate_system = 16;       // e.g., "ENU", "UTM-52N"
+  amr.v1.common.Vector3 origin_offset = 17; // origin offset
+
+  // Owner
+  amr.v1.common.UserId owner_id = 18;
+
+  // Tags
+  repeated string tags = 19;
+
+  // Processing progress (when in PROCESSING state)
+  double processing_progress = 20;    // 0.0 ~ 1.0
+
+  // Ground plane height (for 2D navigation)
+  double ground_plane_z = 21;
+}
+
+// Potree metadata.
+message PotreeMetadata {
+  string base_url = 1;                // Potree tile base URL
+  uint32 hierarchy_depth = 2;         // octree depth
+  uint32 tile_count = 3;              // number of tiles
+  double spacing = 4;                 // root node point spacing (meters)
+  amr.v1.common.BoundingBox tight_bounding_box = 5;
+  repeated string available_attributes = 6; // available attributes (position, color, intensity, etc.)
+}
+
+// Tile data (individual Potree node).
+message TileData {
+  string node_name = 1;               // node name (e.g., "r", "r0", "r01")
+  bytes point_data = 2;               // point data (binary)
+  uint32 point_count = 3;
+  amr.v1.common.BoundingBox bounding_box = 4;
+  uint32 level = 5;                    // LOD level
+  string encoding = 6;                // encoding method (e.g., "LAZ")
+}
+
+// Roadmap graph (robot navigation paths).
+message Roadmap {
+  amr.v1.common.RoadmapId id = 1;
+  amr.v1.common.MapId map_id = 2;     // parent map
+  string name = 3;
+  string description = 4;
+
+  repeated RoadmapNode nodes = 5;
+  repeated RoadmapEdge edges = 6;
+
+  int64 created_at_ms = 7;
+  int64 updated_at_ms = 8;
+
+  // Graph statistics
+  uint32 node_count = 9;
+  uint32 edge_count = 10;
+}
+
+// Roadmap node.
+message RoadmapNode {
+  amr.v1.common.NodeId id = 1;
+  amr.v1.common.Pose2D pose = 2;      // node position
+
+  NodeType node_type = 3;
+  string name = 4;                     // display name (optional)
+  string description = 5;
+
+  // VDA5050 compatible properties
+  map<string, string> actions = 6;    // actions performable at node
+  bool allowed_deviation = 7;          // position deviation allowed
+
+  // Metadata
+  map<string, string> properties = 8;
+}
+
+enum NodeType {
+  NODE_TYPE_UNSPECIFIED = 0;
+  NODE_TYPE_WAYPOINT = 1;             // general waypoint
+  NODE_TYPE_CHARGING_STATION = 2;     // charging station
+  NODE_TYPE_LOADING_POINT = 3;        // loading point
+  NODE_TYPE_UNLOADING_POINT = 4;      // unloading point
+  NODE_TYPE_WAITING_POINT = 5;        // waiting point
+  NODE_TYPE_PARKING = 6;             // parking spot
+  NODE_TYPE_INTERSECTION = 7;        // intersection
+  NODE_TYPE_ELEVATOR = 8;            // elevator
+  NODE_TYPE_DOOR = 9;                // door
+}
+
+// Roadmap edge.
+message RoadmapEdge {
+  amr.v1.common.EdgeId id = 1;
+  amr.v1.common.NodeId start_node_id = 2;
+  amr.v1.common.NodeId end_node_id = 3;
+
+  EdgeType edge_type = 4;
+  bool bidirectional = 5;              // bidirectional (default true)
+
+  double length = 6;                   // edge length (meters)
+  double max_speed = 7;               // max speed (m/s)
+  double max_height = 8;              // max height limit (meters)
+  double max_weight = 9;              // max weight limit (kg)
+
+  // Path interpolation (for non-straight edges)
+  repeated amr.v1.common.Point2D control_points = 10; // Bezier control points
+
+  // VDA5050 compatible properties
+  string orientation_type = 11;       // "GLOBAL", "TANGENTIAL"
+  double orientation = 12;            // edge orientation (radians)
+  double rotation_allowed = 13;       // allowed rotation angle (radians)
+  map<string, string> actions = 14;   // actions performable on edge
+
+  // Traffic control
+  uint32 max_robots = 15;             // max concurrent robots (0 = unlimited)
+
+  // Metadata
+  map<string, string> properties = 16;
+}
+
+enum EdgeType {
+  EDGE_TYPE_UNSPECIFIED = 0;
+  EDGE_TYPE_LINE = 1;                 // straight line
+  EDGE_TYPE_CURVE = 2;               // curve (Bezier)
+  EDGE_TYPE_RAMP = 3;               // ramp
+  EDGE_TYPE_ELEVATOR = 4;           // elevator (vertical movement)
+}
+
+// Semantic region (zone definition).
+message SemanticRegion {
+  amr.v1.common.RegionId id = 1;
+  amr.v1.common.MapId map_id = 2;
+  string name = 3;
+  string description = 4;
+
+  RegionType region_type = 5;
+  amr.v1.common.Polygon2D boundary = 6; // region boundary polygon
+  amr.v1.common.Color color = 7;        // visualization color
+
+  // Rules
+  double speed_limit = 8;             // speed limit (m/s, 0 = no limit)
+  bool entry_restricted = 9;          // entry restriction
+  repeated string allowed_robot_ids = 10; // allowed robot IDs (empty = all allowed)
+  uint32 max_robots = 11;             // max concurrent robots (0 = unlimited)
+
+  // Schedule (time-based rule application)
+  repeated Schedule schedules = 12;
+
+  // Metadata
+  map<string, string> properties = 13;
+  int64 created_at_ms = 14;
+  int64 updated_at_ms = 15;
+}
+
+enum RegionType {
+  REGION_TYPE_UNSPECIFIED = 0;
+  REGION_TYPE_ZONE = 1;              // general zone
+  REGION_TYPE_RESTRICTED = 2;        // restricted zone
+  REGION_TYPE_CHARGING = 3;          // charging zone
+  REGION_TYPE_LOADING = 4;           // loading zone
+  REGION_TYPE_PARKING = 5;           // parking zone
+  REGION_TYPE_SLOW = 6;             // slow zone
+  REGION_TYPE_ONE_WAY = 7;          // one-way zone
+  REGION_TYPE_BUFFER = 8;           // buffer (waiting) zone
+  REGION_TYPE_DANGER = 9;           // danger zone
+  REGION_TYPE_CLEAN_ROOM = 10;      // clean room
+}
+
+// Time schedule.
+message Schedule {
+  string cron_expression = 1;        // cron expression (application time)
+  bool active = 2;                    // true: rule active, false: inactive
+}
+
+// Pathfinding request.
+message PathfindingRequest {
+  amr.v1.common.RoadmapId roadmap_id = 1;
+  amr.v1.common.NodeId start_node_id = 2;
+  amr.v1.common.NodeId goal_node_id = 3;
+  PathfindingAlgorithm algorithm = 4;
+  amr.v1.common.RobotId robot_id = 5;  // for robot-specific constraints
+  PathConstraints constraints = 6;
+}
+
+enum PathfindingAlgorithm {
+  PATHFINDING_ALGORITHM_UNSPECIFIED = 0;
+  PATHFINDING_ALGORITHM_DIJKSTRA = 1;
+  PATHFINDING_ALGORITHM_A_STAR = 2;
+  PATHFINDING_ALGORITHM_THETA_STAR = 3;
+}
+
+message PathConstraints {
+  double max_path_length = 1;         // max path length (meters, 0 = unlimited)
+  double max_height = 2;              // robot height (meters)
+  double max_weight = 3;              // robot weight (kg)
+  repeated string avoid_region_ids = 4; // region IDs to avoid
+}
+
+// Pathfinding result.
+message PathfindingResult {
+  bool found = 1;
+  repeated amr.v1.common.NodeId path_node_ids = 2;  // path node ID list
+  repeated amr.v1.common.EdgeId path_edge_ids = 3;  // path edge ID list
+  double total_distance = 4;          // total distance (meters)
+  double estimated_time = 5;          // estimated time (seconds)
+}

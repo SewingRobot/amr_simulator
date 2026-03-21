@@ -1,0 +1,195 @@
+// proto/asset/asset_service.proto
+//
+// Asset manager gRPC service definition.
+// Backend (Team 2) and Sim Engine (Team 3) are clients of this service.
+
+syntax = "proto3";
+package amr.v1.asset;
+
+import "common/identifiers.proto";
+import "asset/asset_types.proto";
+
+service AssetService {
+  // === Asset CRUD ===
+
+  // Register asset metadata (pre-upload step).
+  rpc CreateAsset(CreateAssetRequest) returns (CreateAssetResponse);
+
+  // Get asset info.
+  rpc GetAsset(GetAssetRequest) returns (AssetDescriptor);
+
+  // List assets (with filtering/pagination).
+  rpc ListAssets(ListAssetsRequest) returns (ListAssetsResponse);
+
+  // Update asset metadata.
+  rpc UpdateAsset(UpdateAssetRequest) returns (AssetDescriptor);
+
+  // Delete (archive) an asset.
+  rpc DeleteAsset(DeleteAssetRequest) returns (DeleteAssetResponse);
+
+  // === File Upload/Download ===
+
+  // Get a presigned URL for asset file upload.
+  rpc GetUploadUrl(GetUploadUrlRequest) returns (GetUploadUrlResponse);
+
+  // Get a presigned URL for asset file download.
+  rpc GetDownloadUrl(GetDownloadUrlRequest) returns (GetDownloadUrlResponse);
+
+  // Notify upload completion (triggers auto-conversion).
+  rpc CompleteUpload(CompleteUploadRequest) returns (CompleteUploadResponse);
+
+  // Download asset file via gRPC stream (for Sim Engine).
+  rpc DownloadAssetStream(DownloadAssetStreamRequest) returns (stream AssetChunk);
+
+  // === Conversion ===
+
+  // Request explicit format conversion.
+  rpc ConvertAsset(ConvertAssetRequest) returns (ConversionJob);
+
+  // Get conversion job status.
+  rpc GetConversionJob(GetConversionJobRequest) returns (ConversionJob);
+
+  // List conversion jobs.
+  rpc ListConversionJobs(ListConversionJobsRequest) returns (ListConversionJobsResponse);
+
+  // === Validation ===
+
+  // Validate a URDF/SDF file.
+  rpc ValidateAsset(ValidateAssetRequest) returns (ValidateAssetResponse);
+}
+
+// --- Request/Response messages ---
+
+message CreateAssetRequest {
+  string name = 1;
+  string description = 2;
+  AssetType asset_type = 3;
+  AssetFormat format = 4;
+  string original_filename = 5;
+  uint64 file_size_bytes = 6;
+  repeated string tags = 7;
+}
+
+message CreateAssetResponse {
+  AssetDescriptor asset = 1;
+  string upload_url = 2;             // presigned upload URL
+}
+
+message GetAssetRequest {
+  amr.v1.common.AssetId asset_id = 1;
+}
+
+message ListAssetsRequest {
+  uint32 page_size = 1;              // page size (default 20, max 100)
+  string page_token = 2;
+  AssetType type_filter = 3;         // type filter (UNSPECIFIED = all)
+  AssetStatus status_filter = 4;     // status filter
+  string search_query = 5;           // name/tag search query
+  string sort_by = 6;                // sort field: "name", "created_at", "updated_at", "size"
+  bool sort_descending = 7;
+}
+
+message ListAssetsResponse {
+  repeated AssetDescriptor assets = 1;
+  string next_page_token = 2;
+  uint32 total_count = 3;
+}
+
+message UpdateAssetRequest {
+  amr.v1.common.AssetId asset_id = 1;
+  optional string name = 2;
+  optional string description = 3;
+  repeated string tags = 4;
+  bool replace_tags = 5;             // true: replace all tags, false: append tags
+}
+
+message DeleteAssetRequest {
+  amr.v1.common.AssetId asset_id = 1;
+  bool permanent = 2;                // true: permanent delete, false: archive
+}
+
+message DeleteAssetResponse {
+  bool success = 1;
+}
+
+message GetUploadUrlRequest {
+  amr.v1.common.AssetId asset_id = 1;
+  string content_type = 2;           // MIME type
+}
+
+message GetUploadUrlResponse {
+  string upload_url = 1;
+  int64 expires_at_ms = 2;
+}
+
+message GetDownloadUrlRequest {
+  amr.v1.common.AssetId asset_id = 1;
+  AssetFormat format = 2;            // desired format (UNSPECIFIED = original)
+}
+
+message GetDownloadUrlResponse {
+  string download_url = 1;
+  int64 expires_at_ms = 2;
+  AssetFormat format = 3;
+  uint64 file_size_bytes = 4;
+}
+
+message CompleteUploadRequest {
+  amr.v1.common.AssetId asset_id = 1;
+  string checksum_sha256 = 2;        // client-side checksum (integrity verification)
+  bool auto_convert = 3;             // start auto-conversion (default true)
+}
+
+message CompleteUploadResponse {
+  AssetDescriptor asset = 1;
+  ConversionJob conversion_job = 2;  // if auto-conversion was started
+}
+
+message DownloadAssetStreamRequest {
+  amr.v1.common.AssetId asset_id = 1;
+  AssetFormat format = 2;
+}
+
+message AssetChunk {
+  bytes data = 1;                    // chunk data (max 64KB)
+  uint64 offset = 2;                 // offset (bytes)
+  uint64 total_size = 3;             // total size (bytes)
+}
+
+message ConvertAssetRequest {
+  amr.v1.common.AssetId asset_id = 1;
+  AssetFormat target_format = 2;
+  ConversionOptions options = 3;
+}
+
+message GetConversionJobRequest {
+  amr.v1.common.ConversionJobId job_id = 1;
+}
+
+message ListConversionJobsRequest {
+  amr.v1.common.AssetId asset_id = 1;  // filter by asset (optional)
+  uint32 page_size = 2;
+  string page_token = 3;
+}
+
+message ListConversionJobsResponse {
+  repeated ConversionJob jobs = 1;
+  string next_page_token = 2;
+}
+
+message ValidateAssetRequest {
+  amr.v1.common.AssetId asset_id = 1;
+}
+
+message ValidateAssetResponse {
+  bool valid = 1;
+  repeated ValidationError errors = 2;
+  repeated ValidationError warnings = 3;
+}
+
+message ValidationError {
+  string code = 1;                   // error code
+  string message = 2;               // error message
+  string location = 3;              // error location (XPath, etc.)
+  string severity = 4;              // "error" | "warning"
+}

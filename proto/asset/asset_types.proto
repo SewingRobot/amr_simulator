@@ -1,0 +1,190 @@
+// proto/asset/asset_types.proto
+//
+// Asset management related type definitions.
+// Assets include robot models (URDF/SDF), 3D models (glTF), environment models, etc.
+
+syntax = "proto3";
+package amr.v1.asset;
+
+import "common/identifiers.proto";
+import "common/geometry.proto";
+
+// Asset type.
+enum AssetType {
+  ASSET_TYPE_UNSPECIFIED = 0;
+  ASSET_TYPE_ROBOT_MODEL = 1;         // robot model (URDF/SDF)
+  ASSET_TYPE_ENVIRONMENT_MODEL = 2;   // environment model (glTF, OBJ, etc.)
+  ASSET_TYPE_TEXTURE = 3;             // texture (PNG, JPG, etc.)
+  ASSET_TYPE_MATERIAL = 4;            // material definition
+  ASSET_TYPE_MESH = 5;                // mesh data (STL, DAE, etc.)
+  ASSET_TYPE_PLUGIN = 6;              // WASM plugin
+  ASSET_TYPE_ICON = 7;                // icon (SVG, PNG)
+  ASSET_TYPE_THUMBNAIL = 8;           // thumbnail
+}
+
+// Asset file format.
+enum AssetFormat {
+  ASSET_FORMAT_UNSPECIFIED = 0;
+  ASSET_FORMAT_URDF = 1;              // Unified Robot Description Format
+  ASSET_FORMAT_SDF = 2;               // Simulation Description Format
+  ASSET_FORMAT_GLTF = 3;              // GL Transmission Format (JSON)
+  ASSET_FORMAT_GLB = 4;               // GL Transmission Format (Binary)
+  ASSET_FORMAT_OBJ = 5;              // Wavefront OBJ
+  ASSET_FORMAT_STL = 6;              // STereoLithography
+  ASSET_FORMAT_DAE = 7;              // COLLADA
+  ASSET_FORMAT_FBX = 8;              // Filmbox
+  ASSET_FORMAT_PNG = 9;
+  ASSET_FORMAT_JPG = 10;
+  ASSET_FORMAT_SVG = 11;
+  ASSET_FORMAT_WASM = 12;             // WebAssembly
+}
+
+// Asset status.
+enum AssetStatus {
+  ASSET_STATUS_UNSPECIFIED = 0;
+  ASSET_STATUS_UPLOADING = 1;         // uploading
+  ASSET_STATUS_PROCESSING = 2;        // processing (conversion, validation, etc.)
+  ASSET_STATUS_READY = 3;             // ready to use
+  ASSET_STATUS_ERROR = 4;             // error occurred
+  ASSET_STATUS_ARCHIVED = 5;          // archived
+}
+
+// Asset descriptor (metadata).
+message AssetDescriptor {
+  amr.v1.common.AssetId id = 1;
+  string name = 2;                     // display name
+  string description = 3;             // description (optional)
+  AssetType asset_type = 4;
+  AssetFormat original_format = 5;    // original file format
+  AssetStatus status = 6;
+
+  // File info
+  string original_filename = 7;       // original filename
+  uint64 file_size_bytes = 8;         // file size (bytes)
+  string checksum_sha256 = 9;         // SHA-256 checksum
+
+  // Converted format list
+  repeated ConvertedAsset converted_assets = 10;
+
+  // Robot model specific metadata
+  RobotModelMetadata robot_metadata = 11;
+
+  // Bounding box
+  amr.v1.common.BoundingBox bounding_box = 12;
+
+  // Timestamps
+  int64 created_at_ms = 13;
+  int64 updated_at_ms = 14;
+
+  // Tags (for search/classification)
+  repeated string tags = 15;
+
+  // Owner
+  amr.v1.common.UserId owner_id = 16;
+
+  // Thumbnail URL (presigned)
+  string thumbnail_url = 17;
+
+  // Version
+  uint32 version = 18;
+}
+
+// Converted asset info.
+message ConvertedAsset {
+  AssetFormat format = 1;
+  string storage_path = 2;            // storage path in MinIO
+  uint64 file_size_bytes = 3;
+  int64 converted_at_ms = 4;
+  string download_url = 5;            // presigned URL (time-limited)
+}
+
+// Robot model specific metadata.
+message RobotModelMetadata {
+  string manufacturer = 1;
+  string model_name = 2;
+  repeated JointInfo joints = 3;
+  repeated LinkInfo links = 4;
+  repeated SensorInfo sensors = 5;
+  KinematicsType kinematics = 6;
+  double max_speed = 7;               // max speed (m/s)
+  double max_payload = 8;             // max payload (kg)
+  double weight = 9;                  // self weight (kg)
+}
+
+enum KinematicsType {
+  KINEMATICS_TYPE_UNSPECIFIED = 0;
+  KINEMATICS_TYPE_DIFFERENTIAL = 1;   // differential drive
+  KINEMATICS_TYPE_OMNIDIRECTIONAL = 2; // omnidirectional
+  KINEMATICS_TYPE_ACKERMANN = 3;      // Ackermann steering
+  KINEMATICS_TYPE_MECANUM = 4;        // mecanum wheel
+}
+
+message JointInfo {
+  string name = 1;
+  string type = 2;                    // revolute, prismatic, fixed, continuous, floating, planar
+  string parent_link = 3;
+  string child_link = 4;
+  amr.v1.common.Vector3 axis = 5;
+  double lower_limit = 6;
+  double upper_limit = 7;
+  double max_effort = 8;
+  double max_velocity = 9;
+}
+
+message LinkInfo {
+  string name = 1;
+  double mass = 2;                    // mass (kg)
+  amr.v1.common.Vector3 inertia = 3; // inertia moment (Ixx, Iyy, Izz)
+  bool has_visual = 4;
+  bool has_collision = 5;
+}
+
+message SensorInfo {
+  string name = 1;
+  string type = 2;                    // lidar, camera, imu, ultrasonic, encoder
+  string parent_link = 3;
+  amr.v1.common.Transform pose_offset = 4; // sensor pose relative to parent link
+  map<string, string> parameters = 5; // sensor-specific parameters
+}
+
+// Asset conversion job.
+message ConversionJob {
+  amr.v1.common.ConversionJobId id = 1;
+  amr.v1.common.AssetId source_asset_id = 2;
+  AssetFormat source_format = 3;
+  AssetFormat target_format = 4;
+  ConversionStatus status = 5;
+  double progress = 6;                // progress (0.0 ~ 1.0)
+  string error_message = 7;
+  int64 created_at_ms = 8;
+  int64 completed_at_ms = 9;
+  ConversionOptions options = 10;
+}
+
+enum ConversionStatus {
+  CONVERSION_STATUS_UNSPECIFIED = 0;
+  CONVERSION_STATUS_QUEUED = 1;
+  CONVERSION_STATUS_IN_PROGRESS = 2;
+  CONVERSION_STATUS_COMPLETED = 3;
+  CONVERSION_STATUS_FAILED = 4;
+  CONVERSION_STATUS_CANCELLED = 5;
+}
+
+// Conversion options.
+message ConversionOptions {
+  bool generate_thumbnail = 1;        // generate thumbnail (default true)
+  bool simplify_mesh = 2;             // mesh simplification (default false)
+  double target_triangle_count = 3;   // target triangle count (when simplify_mesh is true)
+  bool embed_textures = 4;            // embed textures (glTF/GLB, default true)
+  TextureResolution max_texture_resolution = 5;
+}
+
+enum TextureResolution {
+  TEXTURE_RESOLUTION_UNSPECIFIED = 0;
+  TEXTURE_RESOLUTION_256 = 1;
+  TEXTURE_RESOLUTION_512 = 2;
+  TEXTURE_RESOLUTION_1024 = 3;
+  TEXTURE_RESOLUTION_2048 = 4;
+  TEXTURE_RESOLUTION_4096 = 5;
+  TEXTURE_RESOLUTION_ORIGINAL = 6;
+}
