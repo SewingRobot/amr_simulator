@@ -117,23 +117,30 @@ void CustomLightweightBackend::clampToBounds() {
     if (!m_hasBounds) return;
 
     for (auto& [id, body] : bodies_) {
-        double r = body.radius;
-        // Clamp position within world bounds
-        if (body.pose.x - r < 0.0) {
+        double r = body.radius + 0.05;  // small buffer so body visually stays inside wall
+        bool hit = false;
+
+        if (body.pose.x < r) {
             body.pose.x = r;
-            body.velocity.linear = 0.0;
+            hit = true;
         }
-        if (body.pose.x + r > m_worldWidth) {
+        if (body.pose.x > m_worldWidth - r) {
             body.pose.x = m_worldWidth - r;
-            body.velocity.linear = 0.0;
+            hit = true;
         }
-        if (body.pose.y - r < 0.0) {
+        if (body.pose.y < r) {
             body.pose.y = r;
-            body.velocity.linear = 0.0;
+            hit = true;
         }
-        if (body.pose.y + r > m_worldHeight) {
+        if (body.pose.y > m_worldHeight - r) {
             body.pose.y = m_worldHeight - r;
-            body.velocity.linear = 0.0;
+            hit = true;
+        }
+
+        // When hitting a wall, reverse the heading slightly to nudge away
+        if (hit) {
+            body.pose.theta += M_PI * 0.5;  // turn 90 degrees on wall contact
+            while (body.pose.theta > M_PI) body.pose.theta -= 2.0 * M_PI;
         }
     }
 }
