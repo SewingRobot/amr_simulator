@@ -27,7 +27,7 @@ pub async fn run_migrations(pool: &PgPool) -> Result<()> {
     ];
 
     for (i, migration) in migrations.iter().enumerate() {
-        sqlx::query(migration)
+        sqlx::raw_sql(migration)
             .execute(pool)
             .await
             .with_context(|| format!("Failed to run migration {}", i + 1))?;
