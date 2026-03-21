@@ -28,8 +28,8 @@ export function CameraController() {
 
       switch (mode) {
         case 'topdown':
-          camera.position.set(0, 20, 0)
-          camera.lookAt(0, 0, 0)
+          camera.position.set(10, 20, -7.5)
+          camera.lookAt(10, 0, -7.5)
           if (controlsRef.current) {
             controlsRef.current.maxPolarAngle = 0
             controlsRef.current.minPolarAngle = 0
@@ -37,8 +37,8 @@ export function CameraController() {
           break
         case 'orbit':
         default:
-          camera.position.set(10, 10, 10)
-          camera.lookAt(0, 0, 0)
+          camera.position.set(20, 15, 5)
+          camera.lookAt(10, 0, -7.5)
           if (controlsRef.current) {
             controlsRef.current.maxPolarAngle = Math.PI / 2
             controlsRef.current.minPolarAngle = 0
@@ -58,7 +58,7 @@ export function CameraController() {
       // Animate to top-down orthographic position
       animStart.current.position.copy(camera.position)
       animStart.current.zoom = (camera as THREE.PerspectiveCamera).zoom ?? 1
-      animTarget.current.position.set(0, 50, 0.001) // slight Z offset to avoid gimbal lock
+      animTarget.current.position.set(10, 50, -7.499) // world center, slight offset for gimbal lock
       animTarget.current.zoom = 1
       animProgress.current = 0
       animating.current = true
@@ -71,7 +71,7 @@ export function CameraController() {
     } else {
       // Animate back to 3D perspective
       animStart.current.position.copy(camera.position)
-      animTarget.current.position.set(10, 10, 10)
+      animTarget.current.position.set(20, 15, 5)
       animProgress.current = 0
       animating.current = true
 
@@ -97,10 +97,10 @@ export function CameraController() {
       animTarget.current.position,
       eased,
     )
-    camera.lookAt(0, 0, 0)
+    camera.lookAt(10, 0, -7.5)
 
     if (controlsRef.current) {
-      controlsRef.current.target.set(0, 0, 0)
+      controlsRef.current.target.set(10, 0, -7.5)
       controlsRef.current.update()
     }
 
