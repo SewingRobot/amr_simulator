@@ -21,6 +21,7 @@ struct RobotTelemetry {
     Velocity2D velocity{0.0, 0.0};
     double battery_percent = 100.0;
     std::string status = "idle";  // "idle", "busy", "error"
+    std::vector<double> lidar_ranges;  // LiDAR range data (possibly downsampled)
 
     nlohmann::json toJson() const;
 };

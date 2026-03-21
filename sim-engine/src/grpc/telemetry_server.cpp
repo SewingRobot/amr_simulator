@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <cerrno>
+#include <cmath>
 #include <cstring>
 #include <algorithm>
 
@@ -20,6 +21,20 @@ namespace amr::sim {
 // ─── RobotTelemetry ─────────────────────────────────────────────────
 
 nlohmann::json RobotTelemetry::toJson() const {
+    // Downsample lidar ranges to at most 72 values to keep messages compact
+    constexpr size_t max_lidar_values = 72;
+    nlohmann::json lidar_json = nlohmann::json::array();
+
+    if (!lidar_ranges.empty()) {
+        size_t step = 1;
+        if (lidar_ranges.size() > max_lidar_values) {
+            step = lidar_ranges.size() / max_lidar_values;
+        }
+        for (size_t i = 0; i < lidar_ranges.size(); i += step) {
+            lidar_json.push_back(std::round(lidar_ranges[i] * 100.0) / 100.0);  // 2 decimal places
+        }
+    }
+
     return nlohmann::json{
         {"robot_id",        robot_id},
         {"timestamp_ms",    timestamp_ms},
@@ -34,7 +49,8 @@ nlohmann::json RobotTelemetry::toJson() const {
             {"angular", velocity.angular}
         }},
         {"battery_percent", battery_percent},
-        {"status",          status}
+        {"status",          status},
+        {"lidar_ranges",    lidar_json}
     };
 }
 

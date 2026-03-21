@@ -1,5 +1,6 @@
 #include "core/simulation.h"
 #include "physics/backend_factory.h"
+#include "sensors/lidar_2d.h"
 
 #include <spdlog/spdlog.h>
 #include <chrono>
@@ -70,6 +71,8 @@ void Simulation::sendCommand(uint64_t robot_id, double linear, double angular) {
 }
 
 void Simulation::step() {
+    auto step_t0 = std::chrono::steady_clock::now();
+
     double dt = config_.timestep_s;
 
     // Process any queued commands before stepping
@@ -78,7 +81,19 @@ void Simulation::step() {
     {
         std::lock_guard<std::mutex> lock(robots_mutex_);
 
-        // Update robot kinematics
+        // Build world context for LiDAR: for each robot, provide circles of all other robots
+        for (auto& [id, robot] : robots_) {
+            std::vector<RobotCircle> others;
+            others.reserve(robots_.size() > 0 ? robots_.size() - 1 : 0);
+            for (const auto& [oid, other] : robots_) {
+                if (oid == id) continue;
+                Pose2D op = other.getDrive().getPose();
+                others.push_back({op.x, op.y, other.getConfig().collision_radius});
+            }
+            robot.getLidar().setWorldContext(&world_, others);
+        }
+
+        // Update robot kinematics (also updates LiDAR)
         for (auto& [id, robot] : robots_) {
             robot.update(dt);
             Velocity2D vel = robot.getDrive().getVelocity();
@@ -96,6 +111,10 @@ void Simulation::step() {
     }
 
     sim_time_ += dt;
+
+    auto step_t1 = std::chrono::steady_clock::now();
+    double elapsed_ms = std::chrono::duration<double, std::milli>(step_t1 - step_t0).count();
+    spdlog::debug("Step time: {:.3f}ms", elapsed_ms);
 }
 
 void Simulation::start() {
@@ -178,6 +197,8 @@ std::vector<RobotTelemetry> Simulation::getTelemetry() const {
         t.pose = robot.getDrive().getPose();
         t.velocity = robot.getDrive().getVelocity();
         t.battery_percent = robot.getBattery();
+
+        t.lidar_ranges = robot.getLidarData();
 
         // Determine status based on velocity
         double speed = std::abs(t.velocity.linear) + std::abs(t.velocity.angular);

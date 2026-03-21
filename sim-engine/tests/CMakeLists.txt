@@ -1,6 +1,7 @@
 add_executable(sim_tests
     test_differential_drive.cpp
     test_lidar_2d.cpp
+    test_multi_robot_lidar.cpp
     test_server.cpp
 )
 target_link_libraries(sim_tests PRIVATE sim_engine_lib GTest::gtest_main)

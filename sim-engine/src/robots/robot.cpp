@@ -8,10 +8,15 @@ namespace amr::sim {
 Robot::Robot(const RobotConfig& config)
     : config_(config)
     , drive_(config.drive)
+    , lidar_(config.lidar)
     , battery_(config.battery_capacity) {}
 
 void Robot::update(double dt) {
     drive_.update(dt);
+
+    // Sync lidar pose with drive pose
+    lidar_.setSensorPose(drive_.getPose());
+    lidar_.update(dt);
 
     // Linear battery depletion when moving
     auto vel = drive_.getVelocity();
