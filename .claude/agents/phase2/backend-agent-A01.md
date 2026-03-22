@@ -11,11 +11,12 @@ Build mission CRUD, state machine, VDA5050 order generation, and pathfinding int
 
 ## Week-by-Week Tasks
 
-### Week 9-10: Mission Service Foundation
+### Week 9-10: Mission Service Foundation + Phase 1 Carryover
 - [ ] DB schema: missions, mission_steps tables
 - [ ] Mission CRUD: GET/POST/PUT/DELETE /api/missions
 - [ ] State machine: CREATED → ASSIGNED → EXECUTING → COMPLETED/FAILED/CANCELLED
 - [ ] Transition validation (only valid state changes allowed)
+- [ ] **Carryover C-04/C-05:** Wire Asset Manager and Map Manager gRPC proxies with MinIO (complete actual file storage flow)
 
 ### Week 11-12: VDA5050 & Pathfinding
 - [ ] VDA5050 Order message generation from mission steps

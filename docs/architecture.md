@@ -182,8 +182,8 @@ LAS/PLY 포인트 클라우드 업로드 → Map Manager
 
 | Phase | 기간 | 내용 | 마일스톤 |
 |-------|------|------|----------|
-| **Phase 1: Prototype** | Week 1-8 | 핵심 기능(C-01~C-06) 전체 구현. 시뮬레이션 필수 포함. E2E 데이터 플로우 동작 | 시뮬 로봇이 맵 위에서 주행하고, 브라우저에서 실시간 3D 시각화 |
-| **Phase 2: Mission & Control** | Week 9-16 | A-01 미션 시스템, A-02 트래픽, A-03 원격 조종, A-06 맵 에디터 | 미션 생성→로봇 할당→시뮬 실행→모니터링 전체 흐름 |
+| **Phase 1: Prototype** | Week 1-8 | 핵심 기능(C-01~C-06) 전체 구현. 시뮬레이션 필수 포함. E2E 데이터 플로우 동작 | **COMPLETE** — 80 tests passing, E2E verified |
+| **Phase 2: Mission & Control** | Week 9-16 | A-01 미션 시스템, A-02 트래픽, A-03 원격 조종, A-06 맵 에디터 + Phase 1 carryover (C-04 Potree, C-05 MinIO) | **IN PROGRESS** — 미션 생성→로봇 할당→시뮬 실행→모니터링 전체 흐름 |
 | **Phase 3: Real Robot & Advanced Sim** | Week 17-22 | A-04 VDA5050 실로봇, A-05 고급 시뮬(MuJoCo/Isaac Sim), A-09 OpenUSD | 실로봇+시뮬 동일 인터페이스 운용 |
 | **Phase 4: Production** | Week 23-30 | A-07 플러그인, A-08 대시보드, A-10 디지털 트윈, 배포 자동화, 보안 강화 | 프로덕션 레디 |
 

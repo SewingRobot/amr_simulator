@@ -86,9 +86,20 @@ C-03 Backend Core ──→ A-07 Plugin System
 
 **목표:** 미션 생성→로봇 할당→시뮬 실행→모니터링 전체 흐름 완성.
 
+#### Phase 1 Carryover (Week 9-10)
+
+The following items from Phase 1 were completed as scaffolds and need MinIO integration during Phase 2:
+
+| ID | Item | Integrate With | Owner |
+|----|------|---------------|-------|
+| C-04 | Potree tile serving with MinIO (actual point cloud upload/process/serve) | A-06 Map Editor | T5-MapManager |
+| C-05 | Asset upload/download with MinIO (actual file storage flow) | A-09 OpenUSD Pipeline | T4-AssetManager |
+
+These should be completed in Week 9-10 alongside A-01/A-02 setup work.
+
 | 주차 | T1-Frontend | T2-Backend | T3-SimEngine | T4-AssetManager | T5-MapManager |
 |------|-------------|------------|--------------|-----------------|---------------|
-| W9-10 | 미션 UI 스캐폴딩, 맵 에디터 기본 UI | **A-01** 미션 CRUD API, 상태머신 | 다중 로봇 시뮬 지원 | 에셋 버전 관리 | **A-06** 시맨틱 영역 API |
+| W9-10 | 미션 UI 스캐폴딩, 맵 에디터 기본 UI | **A-01** 미션 CRUD API, 상태머신 + MinIO proxy wiring (C-04/C-05 carryover) | 다중 로봇 시뮬 지원 | 에셋 버전 관리 + **C-05 MinIO integration** | **A-06** 시맨틱 영역 API + **C-04 Potree MinIO integration** |
 | W11-12 | **A-03** 원격 조종 UI (키보드/조이스틱) | **A-01** VDA5050 오더 생성, 경로 계획 | **A-03** 원격 명령 수신, 카메라 시뮬 | 에셋 검색/필터링 | **A-06** 장애물 배치, 편집 API |
 | W13-14 | **A-06** 맵 에디터 프론트 (편집 도구, 언두/리두) | **A-02** 트래픽 관리 (존 잠금, 충돌 감지) | WebRTC 카메라 피드 스트리밍 | 에셋 프리뷰 생성 | 맵 에디터 백엔드 통합 |
 | W15-16 | 미션 모니터링 대시보드, 통합 테스트 | **A-02** 우선순위 큐, 데드락 방지 | 트래픽 시나리오 테스트 | 통합 테스트 | 통합 테스트 |
