@@ -13,35 +13,35 @@ Generate test data, build mock servers, and validate the end-to-end telemetry fl
 ## Week-by-Week Tasks
 
 ### Week 1-2: Test Data & Mocks
-- [ ] Test data generator scripts (`test-data/generators/`)
-- [ ] Generate XS dataset (1 robot, 1K points, 3 nodes)
-- [ ] Generate S dataset (3 robots, 10K points, 10 nodes)
-- [ ] Sample robot config JSON, world JSON, telemetry sequence
-- [ ] Mock gRPC servers for Sim Engine, Asset Manager, Map Manager
+- [ ] Test data generator scripts (`test-data/generators/`) — NOT DONE
+- [ ] Generate XS dataset — NOT DONE
+- [ ] Generate S dataset — NOT DONE
+- [x] Sample world JSON (basic_warehouse.json)
+- [ ] Mock gRPC servers for Sim Engine, Asset Manager, Map Manager — NOT DONE
 - **Deliverable:** Test fixtures ready, mock servers runnable
 
 ### Week 3-4: Mock Infrastructure
-- [ ] MSW (Mock Service Worker) handlers for Frontend development
-- [ ] Mock WebSocket server generating fake telemetry (10Hz)
-- [ ] Mock Potree tiles (pre-generated small dataset)
-- [ ] Mock glTF robot model (simple box)
-- [ ] Seed-based generation (SEED=42 for reproducibility)
+- [ ] MSW (Mock Service Worker) handlers for Frontend development — NOT DONE
+- [ ] Mock WebSocket server generating fake telemetry (10Hz) — NOT DONE
+- [ ] Mock Potree tiles (pre-generated small dataset) — NOT DONE
+- [ ] Mock glTF robot model (simple box) — NOT DONE
+- [ ] Seed-based generation (SEED=42 for reproducibility) — NOT DONE
 - **Deliverable:** All mocks operational for team dev
 
 ### Week 5-6: E2E Test Scripts
-- [ ] Telemetry latency measurement tool (timestamp at each hop)
-- [ ] Multi-robot stress test (10 robots × 10Hz × 60 seconds)
-- [ ] WebSocket reconnection test (kill + auto-reconnect)
-- [ ] Multiple client test (3 browsers receive same telemetry)
-- [ ] Generate M dataset (10 robots, 1M points, 50 nodes)
+- [ ] Telemetry latency measurement tool — NOT DONE
+- [ ] Multi-robot stress test — IMPLICIT (demo_runner.py)
+- [ ] WebSocket reconnection test — NOT DONE (logic exists but no formal test)
+- [ ] Multiple client test — NOT DONE
+- [ ] Generate M dataset — NOT DONE
 - **Deliverable:** E2E test scripts ready
 
 ### Week 7-8: Integration Validation
-- [ ] Docker Compose full-stack integration test
-- [ ] Run all E2E scenarios against real services
-- [ ] Measure: latency p50/p95/p99 (target: <100ms p95)
-- [ ] Verify: no dropped messages over 60s
-- [ ] Phase 1 checkpoint report (`docs/checkpoints/`)
+- [x] Docker Compose full-stack integration test (manual)
+- [x] Run all E2E scenarios against real services (manual)
+- [ ] Measure: latency p50/p95/p99 — NOT MEASURED
+- [ ] Verify: no dropped messages over 60s — NOT VERIFIED
+- [x] Phase 1 checkpoint report (`docs/checkpoints/`)
 - **Deliverable:** Phase 1 E2E validated, checkpoint report written
 
 ## Reference Documents
@@ -61,9 +61,9 @@ Generate test data, build mock servers, and validate the end-to-end telemetry fl
 - Docker Compose changes via infra-agent
 
 ## Definition of Done
-- [ ] Test data generators for all data types
-- [ ] XS/S/M fixture datasets generated
-- [ ] Mock servers for all 3 internal services
-- [ ] E2E telemetry test: Sim→Backend→Frontend verified
-- [ ] Latency <100ms p95 confirmed
-- [ ] Phase 1 checkpoint report written
+- [ ] Test data generators for all data types — NOT DONE
+- [ ] XS/S/M fixture datasets generated — NOT DONE
+- [ ] Mock servers for all 3 internal services — NOT DONE
+- [x] E2E telemetry test: Sim→Backend→Frontend verified (manual)
+- [ ] Latency <100ms p95 confirmed — NOT MEASURED
+- [x] Phase 1 checkpoint report written

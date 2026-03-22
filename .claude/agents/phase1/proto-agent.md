@@ -13,31 +13,31 @@ Define and maintain all shared Protobuf schemas, process RFCs, and ensure interf
 ## Week-by-Week Tasks
 
 ### Week 1: Schema Drafting
-- [ ] Create `proto/` directory structure: common/, simulation/, asset/, map/, mission/
-- [ ] Draft `common/geometry.proto` (Vector3, Quaternion, Pose3D, Pose2D, Twist, BoundingBox)
-- [ ] Draft `common/telemetry.proto` (TelemetryMessage, RobotState, BatteryStatus)
-- [ ] Draft `common/identifiers.proto` (wrapper types for UUIDs)
-- [ ] Draft `simulation/sim_service.proto` (SimulationService RPCs)
-- [ ] Draft `asset/asset_service.proto` (AssetService RPCs)
-- [ ] Draft `map/map_service.proto` (MapService RPCs)
-- [ ] Draft `mission/mission_types.proto` (Mission, MissionStep, MissionStatus)
-- [ ] Submit for all-team review
+- [x] Create `proto/` directory structure: common/, simulation/, asset/, map/, mission/
+- [x] Draft `common/geometry.proto` (Vector3, Quaternion, Pose3D, Pose2D, Twist, BoundingBox)
+- [x] Draft `common/telemetry.proto` (TelemetryMessage, RobotState, BatteryStatus)
+- [x] Draft `common/identifiers.proto` (wrapper types for UUIDs)
+- [x] Draft `simulation/sim_service.proto` (SimulationService RPCs)
+- [x] Draft `asset/asset_service.proto` (AssetService RPCs)
+- [x] Draft `map/map_service.proto` (MapService RPCs)
+- [x] Draft `mission/mission_types.proto` (Mission, MissionStep, MissionStatus)
+- [x] Submit for all-team review (implicit)
 - **Deliverable:** Complete proto draft for review
 
 ### Week 2: Proto Freeze
-- [ ] Collect team feedback on proto drafts
-- [ ] Resolve conflicts and finalize schemas
-- [ ] Verify code generation: tonic-build (Rust), protoc-gen-ts (TS), grpc++ (C++)
-- [ ] Tag: `proto-freeze-v1`
-- [ ] Update `docs/integration/integration-spec.md` with final schemas
+- [x] Collect team feedback on proto drafts
+- [x] Resolve conflicts and finalize schemas
+- [ ] Verify code generation — PARTIALLY (sim engine had protoc version mismatch)
+- [ ] Tag: `proto-freeze-v1` — NOT DONE
+- [x] Update `docs/integration/integration-spec.md` with final schemas
 - **Deliverable:** Proto Freeze complete, all teams can generate code
 
 ### Week 3-8: Maintenance
-- [ ] Process incoming RFCs (review, coordinate approvals)
+- [ ] Process incoming RFCs — NO RFCs CREATED
 - [ ] Apply approved changes to proto files
-- [ ] Verify backward compatibility (buf breaking check)
+- [ ] Verify backward compatibility (buf breaking check) — NOT DONE
 - [ ] Notify teams of proto updates
-- [ ] Maintain integration-spec.md consistency
+- [x] Maintain integration-spec.md consistency
 - **Deliverable:** Proto files stay consistent and up-to-date
 
 ## Reference Documents
@@ -54,7 +54,7 @@ Define and maintain all shared Protobuf schemas, process RFCs, and ensure interf
 - Breaking changes require RFC with all-team approval
 
 ## Definition of Done
-- [ ] All proto files defined and code generation verified
-- [ ] Proto Freeze tag created
-- [ ] integration-spec.md updated
-- [ ] All RFCs processed
+- [x] All proto files defined — code generation PARTIALLY verified (protoc version mismatch)
+- [ ] Proto Freeze tag created — NOT DONE
+- [x] integration-spec.md updated
+- [ ] All RFCs processed — NO RFCs CREATED
