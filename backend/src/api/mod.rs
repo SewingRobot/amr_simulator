@@ -14,17 +14,22 @@ use tokio::sync::broadcast;
 /// slow receivers once this buffer is exceeded.
 const TELEMETRY_CHANNEL_CAPACITY: usize = 256;
 
+/// Channel capacity for mission update broadcasts.
+const MISSION_CHANNEL_CAPACITY: usize = 128;
+
 #[derive(Clone)]
 pub struct AppState {
     pub pool: PgPool,
     pub config: AppConfig,
     pub telemetry_tx: broadcast::Sender<TelemetryMessage>,
+    pub mission_tx: broadcast::Sender<serde_json::Value>,
     pub sim_client: Arc<SimEngineClient>,
 }
 
 impl AppState {
     pub fn new(pool: PgPool, config: AppConfig) -> Self {
         let (telemetry_tx, _) = broadcast::channel(TELEMETRY_CHANNEL_CAPACITY);
+        let (mission_tx, _) = broadcast::channel(MISSION_CHANNEL_CAPACITY);
         let sim_client = Arc::new(SimEngineClient::new(
             config.sim_telemetry_addr.clone(),
             config.sim_command_addr.clone(),
@@ -33,6 +38,7 @@ impl AppState {
             pool,
             config,
             telemetry_tx,
+            mission_tx,
             sim_client,
         }
     }

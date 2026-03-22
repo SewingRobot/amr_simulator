@@ -13,35 +13,35 @@ Build asset upload/download service with metadata CRUD and basic URDF→glTF con
 ## Week-by-Week Tasks
 
 ### Week 1-2: Project Setup
-- [ ] Cargo scaffold (tonic, sqlx, aws-sdk-s3)
-- [ ] PostgreSQL schema: assets, asset_files (with SHA256 checksums)
-- [ ] MinIO bucket setup (`assets/{type}/{id}/{format}/`)
-- [ ] gRPC server skeleton (AssetService)
-- [ ] Python processing environment (urdfpy, trimesh, pygltflib)
+- [x] Cargo scaffold (tonic, sqlx, aws-sdk-s3)
+- [x] PostgreSQL schema: assets, asset_files (with SHA256 checksums)
+- [ ] MinIO bucket setup — NOT TESTED (Docker needed)
+- [x] gRPC server skeleton (AssetService)
+- [x] Python processing environment (urdfpy, trimesh, pygltflib)
 - **Deliverable:** gRPC server starts, DB + MinIO ready
 
 ### Week 3-4: Upload/Download & Metadata
-- [ ] CreateAsset RPC (chunked gRPC stream → MinIO + DB metadata)
-- [ ] DownloadAsset RPC (MinIO → gRPC stream)
-- [ ] ListAssets RPC (filter by type, tags, name)
-- [ ] GetAsset RPC (metadata + file info)
-- [ ] DeleteAsset RPC (cascade: DB + MinIO cleanup)
-- [ ] Asset types: robot_model, static_object (Phase 1 minimum)
+- [ ] CreateAsset RPC — SKELETON ONLY
+- [ ] DownloadAsset RPC — SKELETON ONLY
+- [ ] ListAssets RPC — SKELETON ONLY
+- [ ] GetAsset RPC — SKELETON ONLY
+- [ ] DeleteAsset RPC — SKELETON ONLY
+- [x] Asset types: robot_model, static_object (Phase 1 minimum)
 - **Deliverable:** Upload/download/list/delete working
 
 ### Week 5-6: URDF→glTF Conversion
-- [ ] Python URDF parser (urdfpy): extract links, joints, meshes
-- [ ] Mesh loading (STL/DAE/OBJ via trimesh)
-- [ ] glTF export (pygltflib): combine meshes into single GLB
-- [ ] ConvertAsset RPC trigger → Python subprocess
-- [ ] Conversion job status tracking (pending/processing/completed/failed)
+- [x] Python URDF parser (urdfpy): extract links, joints, meshes
+- [x] Mesh loading (STL/DAE/OBJ via trimesh)
+- [x] glTF export (pygltflib): combine meshes into single GLB
+- [ ] ConvertAsset RPC trigger → Python subprocess — SKELETON ONLY
+- [ ] Conversion job status tracking — SKELETON ONLY
 - **Deliverable:** Upload URDF → auto-convert → download glTF
 
 ### Week 7-8: Integration
-- [ ] Backend proxy integration (REST /api/assets/*)
-- [ ] Validation: mesh integrity check, file size limits
-- [ ] Integration tests (testcontainers)
-- [ ] Test with sample URDF (TurtleBot3-like)
+- [x] Backend proxy integration (basic static file serving)
+- [x] Validation: mesh integrity check, file size limits
+- [ ] Integration tests — NOT DONE
+- [ ] Test with sample URDF — NOT DONE
 - **Deliverable:** E2E: upload URDF → convert → Frontend renders glTF
 
 ## Reference Documents
@@ -59,8 +59,8 @@ Build asset upload/download service with metadata CRUD and basic URDF→glTF con
 - Phase 1: URDF→glTF only. OpenUSD conversion deferred to A-09.
 
 ## Definition of Done
-- [ ] Asset upload/download (chunked streaming)
-- [ ] Metadata CRUD with filtering
-- [ ] URDF→glTF conversion pipeline
-- [ ] Conversion job status tracking
-- [ ] Integration tests pass
+- [ ] Asset upload/download (chunked streaming) — SKELETON ONLY
+- [ ] Metadata CRUD with filtering — SKELETON ONLY
+- [x] URDF→glTF conversion pipeline (Python code: urdfpy + trimesh + glTF export)
+- [ ] Conversion job status tracking — SKELETON ONLY
+- [ ] Integration tests pass — NOT DONE

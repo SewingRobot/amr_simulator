@@ -2,7 +2,7 @@ import { useState, useEffect, type ReactNode } from 'react'
 import { wsManager, type ConnectionState } from '../../services/websocket'
 import { useRobotStore } from '../../stores/robotStore'
 
-type Page = 'viewer' | 'dashboard'
+type Page = 'viewer' | 'dashboard' | 'missions'
 
 interface LayoutProps {
   children: ReactNode
@@ -13,6 +13,7 @@ interface LayoutProps {
 const navItems: { page: Page; label: string }[] = [
   { page: 'viewer', label: '3D Viewer' },
   { page: 'dashboard', label: 'Dashboard' },
+  { page: 'missions', label: 'Missions' },
 ]
 
 const STATE_LABELS: Record<ConnectionState, string> = {

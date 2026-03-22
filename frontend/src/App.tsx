@@ -4,8 +4,9 @@ import { ConnectionStatus } from './components/common/ConnectionStatus'
 import { SceneCanvas } from './components/viewer3d/SceneCanvas'
 import { RobotInfoPanel } from './components/viewer3d/RobotInfoPanel'
 import { DashboardPage } from './components/dashboard/DashboardPage'
+import { MissionListPage } from './components/missions/MissionListPage'
 
-type Page = 'viewer' | 'dashboard'
+type Page = 'viewer' | 'dashboard' | 'missions'
 
 function App() {
   const [page, setPage] = useState<Page>('viewer')
@@ -20,6 +21,7 @@ function App() {
         </div>
       )}
       {page === 'dashboard' && <DashboardPage />}
+      {page === 'missions' && <MissionListPage />}
     </Layout>
   )
 }

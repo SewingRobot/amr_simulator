@@ -13,35 +13,35 @@ Build point cloud upload/processing pipeline with Potree conversion, roadmap gra
 ## Week-by-Week Tasks
 
 ### Week 1-2: Project Setup
-- [ ] Cargo scaffold (tonic, sqlx, aws-sdk-s3)
-- [ ] PostgreSQL + PostGIS schema: maps, pointcloud_data, processing_jobs
-- [ ] MinIO bucket setup (`tiles/`, `raw/`)
-- [ ] gRPC server skeleton (MapService)
-- [ ] Python processing environment (Open3D, laspy, numpy)
+- [x] Cargo scaffold (tonic, sqlx, aws-sdk-s3)
+- [x] PostGIS schema: maps, pointcloud_data, processing_jobs
+- [ ] MinIO bucket setup (`tiles/`, `raw/`) — NOT TESTED (Docker needed)
+- [x] gRPC server skeleton (MapService)
+- [x] Python processing environment (Open3D, laspy, numpy)
 - **Deliverable:** gRPC server starts, DB ready
 
 ### Week 3-4: Point Cloud Pipeline
-- [ ] UploadPointCloud RPC (chunked gRPC stream → MinIO raw/)
-- [ ] Python pipeline: validate → coordinate normalize → voxel downsample (0.02m)
-- [ ] Statistical outlier removal, normal estimation
-- [ ] PotreeConverter integration (octree generation)
-- [ ] Upload octree tiles to MinIO tiles/{map_id}/
-- [ ] GetProcessingStatus RPC (pending/processing/completed/failed, progress %)
+- [ ] UploadPointCloud RPC — SKELETON ONLY
+- [x] Python pipeline code (ingest, preprocess, potree_convert)
+- [ ] Statistical outlier removal — code exists, NOT TESTED
+- [ ] PotreeConverter integration — PLACEHOLDER
+- [ ] Upload octree tiles to MinIO tiles/{map_id}/ — NOT DONE
+- [ ] GetProcessingStatus RPC — SKELETON ONLY
 - **Deliverable:** Upload PLY → process → Potree tiles in MinIO
 
 ### Week 5-6: Tile Serving & Roadmap
-- [ ] GetTile RPC (map_id, node_id, lod → binary tile from MinIO)
-- [ ] Roadmap graph CRUD: AddNode, UpdateNode, DeleteNode, AddEdge, DeleteEdge
-- [ ] GetRoadmapGraph RPC (return all nodes + edges)
-- [ ] PostGIS PointZ for nodes, LineStringZ for edge paths
-- [ ] Roadmap node types: waypoint, charging_station, loading_dock
+- [ ] GetTile RPC — SKELETON ONLY
+- [x] Roadmap graph CRUD: AddNode, UpdateNode, DeleteNode, AddEdge, DeleteEdge (A* + graph, 11 tests)
+- [x] GetRoadmapGraph RPC (return all nodes + edges)
+- [ ] PostGIS PointZ for nodes — NOT DONE (using plain x,y,z columns)
+- [x] Roadmap node types: waypoint, charging_station, loading_dock
 - **Deliverable:** Tiles served, roadmap editable
 
 ### Week 7-8: Integration
-- [ ] Backend proxy integration (tile HTTP proxy, roadmap REST proxy)
-- [ ] Point cloud metadata endpoint (bounds, point_count, LOD levels)
-- [ ] Integration tests (testcontainers: postgres+postgis, minio)
-- [ ] Performance: tile serving <10ms, pipeline handles 1M points
+- [x] Backend proxy integration (roadmap REST proxy — hardcoded, now DB in Phase 2)
+- [ ] Point cloud metadata endpoint — NOT DONE
+- [ ] Integration tests — NOT DONE
+- [ ] Performance benchmarks — NOT DONE (only A* benchmark)
 - **Deliverable:** E2E: upload → process → serve tiles to Frontend
 
 ## Reference Documents
@@ -59,8 +59,8 @@ Build point cloud upload/processing pipeline with Potree conversion, roadmap gra
 - Coordinate system: ENU (X-East, Y-North, Z-Up)
 
 ## Definition of Done
-- [ ] Point cloud upload + Potree conversion pipeline
-- [ ] Tile serving via gRPC
-- [ ] Roadmap graph CRUD (nodes + edges)
-- [ ] Processing status tracking
-- [ ] Integration tests pass
+- [ ] Point cloud upload + Potree conversion pipeline — pipeline code exists but not tested end-to-end
+- [ ] Tile serving via gRPC — SKELETON ONLY
+- [x] Roadmap graph CRUD (nodes + edges) — with A* pathfinding, 11 tests
+- [ ] Processing status tracking — SKELETON ONLY
+- [ ] Integration tests pass — NOT DONE

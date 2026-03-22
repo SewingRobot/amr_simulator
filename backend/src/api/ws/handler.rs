@@ -71,14 +71,16 @@ pub async fn ws_handler(
     }
 
     let telemetry_rx = state.telemetry_tx.subscribe();
+    let mission_rx = state.mission_tx.subscribe();
     let sim_client = state.sim_client.clone();
 
-    ws.on_upgrade(move |socket| handle_socket(socket, telemetry_rx, sim_client))
+    ws.on_upgrade(move |socket| handle_socket(socket, telemetry_rx, mission_rx, sim_client))
 }
 
 async fn handle_socket(
     mut socket: WebSocket,
     mut telemetry_rx: broadcast::Receiver<TelemetryMessage>,
+    mut mission_rx: broadcast::Receiver<serde_json::Value>,
     sim_client: std::sync::Arc<crate::grpc::sim_client::SimEngineClient>,
 ) {
     let mut subscriptions: HashSet<String> = HashSet::new();
@@ -162,6 +164,27 @@ async fn handle_socket(
                     }
                     Err(broadcast::error::RecvError::Closed) => {
                         tracing::info!("Telemetry broadcast channel closed");
+                        break;
+                    }
+                }
+            }
+
+            // Mission updates broadcast channel
+            result = mission_rx.recv() => {
+                match result {
+                    Ok(msg) => {
+                        if subscriptions.contains("missions") {
+                            let text = serde_json::to_string(&msg).unwrap();
+                            if socket.send(Message::Text(text.into())).await.is_err() {
+                                break;
+                            }
+                        }
+                    }
+                    Err(broadcast::error::RecvError::Lagged(n)) => {
+                        tracing::warn!("WebSocket client lagged, skipped {} mission messages", n);
+                    }
+                    Err(broadcast::error::RecvError::Closed) => {
+                        tracing::info!("Mission broadcast channel closed");
                         break;
                     }
                 }

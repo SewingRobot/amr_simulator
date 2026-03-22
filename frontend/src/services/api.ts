@@ -36,6 +36,20 @@ async function request<T>(
   return response.json() as Promise<T>
 }
 
+// Mission API functions
+export const missionApi = {
+  fetchMissions: (status?: string) => {
+    const query = status ? `?status=${status}` : ''
+    return api.get<unknown[]>(`/missions${query}`)
+  },
+  createMission: (req: { start_node_id: string; end_node_id: string; priority?: number }) =>
+    api.post<unknown>('/missions', req),
+  assignMission: (id: string, robotId: string) =>
+    api.post<unknown>(`/missions/${id}/assign`, { robot_id: robotId }),
+  cancelMission: (id: string) =>
+    api.post<unknown>(`/missions/${id}/cancel`, {}),
+}
+
 export const api = {
   get: <T>(endpoint: string, token?: string) =>
     request<T>(endpoint, { token }),

@@ -24,6 +24,9 @@ pub async fn run_migrations(pool: &PgPool) -> Result<()> {
         include_str!("../../migrations/001_create_users.sql"),
         include_str!("../../migrations/002_create_robots.sql"),
         include_str!("../../migrations/003_create_maps.sql"),
+        include_str!("../../migrations/004_create_missions.sql"),
+        include_str!("../../migrations/005_create_roadmap.sql"),
+        include_str!("../../migrations/006_seed_roadmap.sql"),
     ];
 
     for (i, migration) in migrations.iter().enumerate() {
