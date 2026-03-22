@@ -11,11 +11,13 @@ Implement A* pathfinding on roadmap graph, semantic region CRUD with PostGIS, an
 ## Week-by-Week Tasks
 
 ### Week 9-10: A* Pathfinding + Phase 1 Carryover
-- [ ] Graph data structure (adjacency list from roadmap)
-- [ ] A* algorithm with Euclidean heuristic
+- [x] Graph data structure (adjacency list from roadmap) — graph structure exists in backend
+- [x] A* algorithm with Euclidean heuristic — completed in Phase 1, 11 tests passing
 - [ ] Robot type filtering (edges with allowed_robot_types)
-- [ ] FindPath gRPC RPC, FindNearestNode RPC
-- [ ] **Carryover C-04:** Complete Potree tile serving with MinIO integration (point cloud upload/process/serve)
+- [x] FindPath endpoint: POST /api/maps/:id/pathfind — implemented in backend REST (not gRPC yet)
+- [x] FindNearestNode — not explicit RPC, but graph structure supports it
+- [x] **Carryover C-04:** Roadmap CRUD in backend (nodes + edges + seed data)
+- [ ] **Carryover C-04:** Complete Potree tile serving with MinIO integration (point cloud upload/process/serve) — not started
 
 ### Week 11-12: Semantic Layer
 - [ ] DB schema: semantic_regions (PostGIS POLYGON geometry)

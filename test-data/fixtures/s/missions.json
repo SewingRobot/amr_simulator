@@ -1,0 +1,37 @@
+[
+  {
+    "id": "mission-001",
+    "start_node_id": "node-002",
+    "end_node_id": "node-003",
+    "priority": 8,
+    "status": "created"
+  },
+  {
+    "id": "mission-002",
+    "start_node_id": "node-004",
+    "end_node_id": "node-003",
+    "priority": 7,
+    "status": "created"
+  },
+  {
+    "id": "mission-003",
+    "start_node_id": "node-007",
+    "end_node_id": "node-005",
+    "priority": 10,
+    "status": "created"
+  },
+  {
+    "id": "mission-004",
+    "start_node_id": "node-009",
+    "end_node_id": "node-004",
+    "priority": 10,
+    "status": "created"
+  },
+  {
+    "id": "mission-005",
+    "start_node_id": "node-006",
+    "end_node_id": "node-001",
+    "priority": 3,
+    "status": "created"
+  }
+]

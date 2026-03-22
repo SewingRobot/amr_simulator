@@ -1,0 +1,174 @@
+{
+  "nodes": [
+    {
+      "id": "node-001",
+      "name": "Node-1",
+      "node_type": "waypoint",
+      "x": 3.873867694784022,
+      "y": 6.493987175995533,
+      "z": 0.0
+    },
+    {
+      "id": "node-002",
+      "name": "Node-2",
+      "node_type": "waypoint",
+      "x": 6.001684150089553,
+      "y": 3.799078907398654,
+      "z": 0.0
+    },
+    {
+      "id": "node-003",
+      "name": "Node-3",
+      "node_type": "waypoint",
+      "x": 14.742894322117431,
+      "y": 2.328733594758033,
+      "z": 0.0
+    },
+    {
+      "id": "node-004",
+      "name": "Node-4",
+      "node_type": "waypoint",
+      "x": 7.838691411472073,
+      "y": 5.666731946300169,
+      "z": 0.0
+    },
+    {
+      "id": "node-005",
+      "name": "Node-5",
+      "node_type": "waypoint",
+      "x": 7.19120300462148,
+      "y": 4.43877127388617,
+      "z": 0.0
+    },
+    {
+      "id": "node-006",
+      "name": "Node-6",
+      "node_type": "waypoint",
+      "x": 1.7821079726157494,
+      "y": 6.972523435733953,
+      "z": 0.0
+    },
+    {
+      "id": "node-007",
+      "name": "Node-7",
+      "node_type": "waypoint",
+      "x": 3.246870931357768,
+      "y": 12.989839836366079,
+      "z": 0.0
+    },
+    {
+      "id": "node-008",
+      "name": "Node-8",
+      "node_type": "waypoint",
+      "x": 2.4184035654122473,
+      "y": 4.811317658292207,
+      "z": 0.0
+    },
+    {
+      "id": "node-009",
+      "name": "Node-9",
+      "node_type": "charging_station",
+      "x": 12.315516390899981,
+      "y": 12.510872723178489,
+      "z": 0.0
+    },
+    {
+      "id": "node-010",
+      "name": "Node-10",
+      "node_type": "loading_dock",
+      "x": 7.509430471005578,
+      "y": 3.4997516733365788,
+      "z": 0.0
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-001",
+      "source": "node-001",
+      "target": "node-002",
+      "distance": 3.43,
+      "max_speed": 1.5,
+      "direction": "bi"
+    },
+    {
+      "id": "edge-002",
+      "source": "node-002",
+      "target": "node-003",
+      "distance": 8.86,
+      "max_speed": 1.5,
+      "direction": "bi"
+    },
+    {
+      "id": "edge-003",
+      "source": "node-003",
+      "target": "node-004",
+      "distance": 7.67,
+      "max_speed": 1.5,
+      "direction": "bi"
+    },
+    {
+      "id": "edge-004",
+      "source": "node-004",
+      "target": "node-005",
+      "distance": 1.39,
+      "max_speed": 1.5,
+      "direction": "bi"
+    },
+    {
+      "id": "edge-005",
+      "source": "node-005",
+      "target": "node-006",
+      "distance": 5.97,
+      "max_speed": 1.5,
+      "direction": "bi"
+    },
+    {
+      "id": "edge-006",
+      "source": "node-006",
+      "target": "node-007",
+      "distance": 6.19,
+      "max_speed": 1.5,
+      "direction": "bi"
+    },
+    {
+      "id": "edge-007",
+      "source": "node-007",
+      "target": "node-008",
+      "distance": 8.22,
+      "max_speed": 1.5,
+      "direction": "bi"
+    },
+    {
+      "id": "edge-008",
+      "source": "node-008",
+      "target": "node-009",
+      "distance": 12.54,
+      "max_speed": 1.5,
+      "direction": "bi"
+    },
+    {
+      "id": "edge-009",
+      "source": "node-009",
+      "target": "node-010",
+      "distance": 10.21,
+      "max_speed": 1.5,
+      "direction": "bi"
+    },
+    {
+      "id": "edge-extra-1-0",
+      "source": "node-002",
+      "target": "node-001",
+      "distance": 3.43,
+      "max_speed": 1.0,
+      "direction": "bi"
+    },
+    {
+      "id": "edge-extra-1-3",
+      "source": "node-002",
+      "target": "node-004",
+      "distance": 2.62,
+      "max_speed": 1.0,
+      "direction": "bi"
+    }
+  ]
+}

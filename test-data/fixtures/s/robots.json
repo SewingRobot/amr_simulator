@@ -1,0 +1,50 @@
+[
+  {
+    "id": "robot-001",
+    "name": "TestBot-1",
+    "model_id": "simple_diff_drive",
+    "wheel_radius": 0.05,
+    "wheel_separation": 0.3,
+    "max_linear_speed": 2.201324973590236,
+    "max_angular_speed": 2.419519820961659,
+    "collision_radius": 0.25,
+    "sensors": [
+      {
+        "type": "lidar_2d",
+        "name": "front_lidar"
+      }
+    ]
+  },
+  {
+    "id": "robot-002",
+    "name": "TestBot-2",
+    "model_id": "simple_diff_drive",
+    "wheel_radius": 0.05,
+    "wheel_separation": 0.3,
+    "max_linear_speed": 1.9492090462838536,
+    "max_angular_speed": 2.278190708230663,
+    "collision_radius": 0.25,
+    "sensors": [
+      {
+        "type": "lidar_2d",
+        "name": "front_lidar"
+      }
+    ]
+  },
+  {
+    "id": "robot-003",
+    "name": "TestBot-3",
+    "model_id": "simple_diff_drive",
+    "wheel_radius": 0.05,
+    "wheel_separation": 0.3,
+    "max_linear_speed": 2.369300320792934,
+    "max_angular_speed": 2.7588073671297675,
+    "collision_radius": 0.25,
+    "sensors": [
+      {
+        "type": "lidar_2d",
+        "name": "front_lidar"
+      }
+    ]
+  }
+]

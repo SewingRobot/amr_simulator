@@ -1,0 +1,9 @@
+[
+  {
+    "id": "mission-001",
+    "start_node_id": "node-001",
+    "end_node_id": "node-003",
+    "priority": 10,
+    "status": "created"
+  }
+]

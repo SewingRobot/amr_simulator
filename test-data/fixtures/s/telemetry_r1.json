@@ -1,0 +1,1602 @@
+[
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000000000,
+    "pose": {
+      "x": 5.05,
+      "y": 5.0,
+      "theta": 0.01
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.99,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000000100,
+    "pose": {
+      "x": 5.1,
+      "y": 5.0005,
+      "theta": 0.02
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.98,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000000200,
+    "pose": {
+      "x": 5.15,
+      "y": 5.0015,
+      "theta": 0.03
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.97,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000000300,
+    "pose": {
+      "x": 5.2,
+      "y": 5.003,
+      "theta": 0.04
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.96,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000000400,
+    "pose": {
+      "x": 5.2499,
+      "y": 5.005,
+      "theta": 0.05
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.95,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000000500,
+    "pose": {
+      "x": 5.2999,
+      "y": 5.0075,
+      "theta": 0.06
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.94,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000000600,
+    "pose": {
+      "x": 5.3498,
+      "y": 5.0105,
+      "theta": 0.07
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.93,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000000700,
+    "pose": {
+      "x": 5.3997,
+      "y": 5.014,
+      "theta": 0.08
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.92,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000000800,
+    "pose": {
+      "x": 5.4495,
+      "y": 5.018,
+      "theta": 0.09
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.91,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000000900,
+    "pose": {
+      "x": 5.4993,
+      "y": 5.0225,
+      "theta": 0.1
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.9,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000001000,
+    "pose": {
+      "x": 5.549,
+      "y": 5.0275,
+      "theta": 0.11
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.89,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000001100,
+    "pose": {
+      "x": 5.5987,
+      "y": 5.033,
+      "theta": 0.12
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.88,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000001200,
+    "pose": {
+      "x": 5.6484,
+      "y": 5.0389,
+      "theta": 0.13
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.87,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000001300,
+    "pose": {
+      "x": 5.698,
+      "y": 5.0454,
+      "theta": 0.14
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.86,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000001400,
+    "pose": {
+      "x": 5.7475,
+      "y": 5.0524,
+      "theta": 0.15
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.85,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000001500,
+    "pose": {
+      "x": 5.7969,
+      "y": 5.0599,
+      "theta": 0.16
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.84,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000001600,
+    "pose": {
+      "x": 5.8463,
+      "y": 5.0678,
+      "theta": 0.17
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.83,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000001700,
+    "pose": {
+      "x": 5.8955,
+      "y": 5.0763,
+      "theta": 0.18
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.82,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000001800,
+    "pose": {
+      "x": 5.9447,
+      "y": 5.0853,
+      "theta": 0.19
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.81,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000001900,
+    "pose": {
+      "x": 5.9938,
+      "y": 5.0947,
+      "theta": 0.2
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.8,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000002000,
+    "pose": {
+      "x": 6.0428,
+      "y": 5.1046,
+      "theta": 0.21
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.79,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000002100,
+    "pose": {
+      "x": 6.0917,
+      "y": 5.1151,
+      "theta": 0.22
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.78,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000002200,
+    "pose": {
+      "x": 6.1405,
+      "y": 5.126,
+      "theta": 0.23
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.77,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000002300,
+    "pose": {
+      "x": 6.1892,
+      "y": 5.1374,
+      "theta": 0.24
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.76,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000002400,
+    "pose": {
+      "x": 6.2378,
+      "y": 5.1493,
+      "theta": 0.25
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.75,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000002500,
+    "pose": {
+      "x": 6.2862,
+      "y": 5.1616,
+      "theta": 0.26
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.74,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000002600,
+    "pose": {
+      "x": 6.3346,
+      "y": 5.1745,
+      "theta": 0.27
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.73,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000002700,
+    "pose": {
+      "x": 6.3827,
+      "y": 5.1878,
+      "theta": 0.28
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.72,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000002800,
+    "pose": {
+      "x": 6.4308,
+      "y": 5.2016,
+      "theta": 0.29
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.71,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000002900,
+    "pose": {
+      "x": 6.4787,
+      "y": 5.2159,
+      "theta": 0.3
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.7,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000003000,
+    "pose": {
+      "x": 6.5265,
+      "y": 5.2307,
+      "theta": 0.31
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.69,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000003100,
+    "pose": {
+      "x": 6.5741,
+      "y": 5.246,
+      "theta": 0.32
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.68,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000003200,
+    "pose": {
+      "x": 6.6216,
+      "y": 5.2617,
+      "theta": 0.33
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.67,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000003300,
+    "pose": {
+      "x": 6.6689,
+      "y": 5.2779,
+      "theta": 0.34
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.66,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000003400,
+    "pose": {
+      "x": 6.716,
+      "y": 5.2946,
+      "theta": 0.35
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.65,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000003500,
+    "pose": {
+      "x": 6.763,
+      "y": 5.3117,
+      "theta": 0.36
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.64,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000003600,
+    "pose": {
+      "x": 6.8098,
+      "y": 5.3293,
+      "theta": 0.37
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.63,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000003700,
+    "pose": {
+      "x": 6.8564,
+      "y": 5.3474,
+      "theta": 0.38
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.62,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000003800,
+    "pose": {
+      "x": 6.9028,
+      "y": 5.3659,
+      "theta": 0.39
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.61,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000003900,
+    "pose": {
+      "x": 6.949,
+      "y": 5.385,
+      "theta": 0.4
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.6,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000004000,
+    "pose": {
+      "x": 6.9951,
+      "y": 5.4044,
+      "theta": 0.41
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.59,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000004100,
+    "pose": {
+      "x": 7.041,
+      "y": 5.4244,
+      "theta": 0.42
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.58,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000004200,
+    "pose": {
+      "x": 7.0866,
+      "y": 5.4447,
+      "theta": 0.43
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.57,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000004300,
+    "pose": {
+      "x": 7.1321,
+      "y": 5.4656,
+      "theta": 0.44
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.56,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000004400,
+    "pose": {
+      "x": 7.1773,
+      "y": 5.4869,
+      "theta": 0.45
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.55,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000004500,
+    "pose": {
+      "x": 7.2223,
+      "y": 5.5086,
+      "theta": 0.46
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.54,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000004600,
+    "pose": {
+      "x": 7.2671,
+      "y": 5.5308,
+      "theta": 0.47
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.53,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000004700,
+    "pose": {
+      "x": 7.3117,
+      "y": 5.5535,
+      "theta": 0.48
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.52,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000004800,
+    "pose": {
+      "x": 7.3561,
+      "y": 5.5766,
+      "theta": 0.49
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.51,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000004900,
+    "pose": {
+      "x": 7.4002,
+      "y": 5.6001,
+      "theta": 0.5
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.5,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000005000,
+    "pose": {
+      "x": 7.444,
+      "y": 5.6241,
+      "theta": 0.51
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.49,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000005100,
+    "pose": {
+      "x": 7.4877,
+      "y": 5.6485,
+      "theta": 0.52
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.48,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000005200,
+    "pose": {
+      "x": 7.5311,
+      "y": 5.6733,
+      "theta": 0.53
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.47,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000005300,
+    "pose": {
+      "x": 7.5742,
+      "y": 5.6986,
+      "theta": 0.54
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.46,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000005400,
+    "pose": {
+      "x": 7.6171,
+      "y": 5.7243,
+      "theta": 0.55
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.45,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000005500,
+    "pose": {
+      "x": 7.6597,
+      "y": 5.7504,
+      "theta": 0.56
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.44,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000005600,
+    "pose": {
+      "x": 7.7021,
+      "y": 5.777,
+      "theta": 0.57
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.43,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000005700,
+    "pose": {
+      "x": 7.7442,
+      "y": 5.804,
+      "theta": 0.58
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.42,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000005800,
+    "pose": {
+      "x": 7.786,
+      "y": 5.8314,
+      "theta": 0.59
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.41,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000005900,
+    "pose": {
+      "x": 7.8276,
+      "y": 5.8592,
+      "theta": 0.6
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.4,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000006000,
+    "pose": {
+      "x": 7.8688,
+      "y": 5.8874,
+      "theta": 0.61
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.39,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000006100,
+    "pose": {
+      "x": 7.9098,
+      "y": 5.9161,
+      "theta": 0.62
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.38,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000006200,
+    "pose": {
+      "x": 7.9505,
+      "y": 5.9451,
+      "theta": 0.63
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.37,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000006300,
+    "pose": {
+      "x": 7.9909,
+      "y": 5.9746,
+      "theta": 0.64
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.36,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000006400,
+    "pose": {
+      "x": 8.031,
+      "y": 6.0044,
+      "theta": 0.65
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.35,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000006500,
+    "pose": {
+      "x": 8.0708,
+      "y": 6.0347,
+      "theta": 0.66
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.34,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000006600,
+    "pose": {
+      "x": 8.1103,
+      "y": 6.0654,
+      "theta": 0.67
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.33,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000006700,
+    "pose": {
+      "x": 8.1495,
+      "y": 6.0964,
+      "theta": 0.68
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.32,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000006800,
+    "pose": {
+      "x": 8.1884,
+      "y": 6.1278,
+      "theta": 0.69
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.31,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000006900,
+    "pose": {
+      "x": 8.2269,
+      "y": 6.1597,
+      "theta": 0.7
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.3,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000007000,
+    "pose": {
+      "x": 8.2652,
+      "y": 6.1919,
+      "theta": 0.71
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.29,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000007100,
+    "pose": {
+      "x": 8.3031,
+      "y": 6.2245,
+      "theta": 0.72
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.28,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000007200,
+    "pose": {
+      "x": 8.3407,
+      "y": 6.2574,
+      "theta": 0.73
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.27,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000007300,
+    "pose": {
+      "x": 8.3779,
+      "y": 6.2908,
+      "theta": 0.74
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.26,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000007400,
+    "pose": {
+      "x": 8.4149,
+      "y": 6.3245,
+      "theta": 0.75
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.25,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000007500,
+    "pose": {
+      "x": 8.4515,
+      "y": 6.3586,
+      "theta": 0.76
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.24,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000007600,
+    "pose": {
+      "x": 8.4877,
+      "y": 6.393,
+      "theta": 0.77
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.23,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000007700,
+    "pose": {
+      "x": 8.5236,
+      "y": 6.4278,
+      "theta": 0.78
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.22,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000007800,
+    "pose": {
+      "x": 8.5591,
+      "y": 6.463,
+      "theta": 0.79
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.21,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000007900,
+    "pose": {
+      "x": 8.5943,
+      "y": 6.4985,
+      "theta": 0.8
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.2,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000008000,
+    "pose": {
+      "x": 8.6292,
+      "y": 6.5344,
+      "theta": 0.81
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.19,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000008100,
+    "pose": {
+      "x": 8.6636,
+      "y": 6.5706,
+      "theta": 0.82
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.18,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000008200,
+    "pose": {
+      "x": 8.6978,
+      "y": 6.6072,
+      "theta": 0.83
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.17,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000008300,
+    "pose": {
+      "x": 8.7315,
+      "y": 6.6441,
+      "theta": 0.84
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.16,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000008400,
+    "pose": {
+      "x": 8.7649,
+      "y": 6.6813,
+      "theta": 0.85
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.15,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000008500,
+    "pose": {
+      "x": 8.7979,
+      "y": 6.7189,
+      "theta": 0.86
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.14,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000008600,
+    "pose": {
+      "x": 8.8305,
+      "y": 6.7567,
+      "theta": 0.87
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.13,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000008700,
+    "pose": {
+      "x": 8.8627,
+      "y": 6.795,
+      "theta": 0.88
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.12,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000008800,
+    "pose": {
+      "x": 8.8946,
+      "y": 6.8335,
+      "theta": 0.89
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.11,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000008900,
+    "pose": {
+      "x": 8.9261,
+      "y": 6.8724,
+      "theta": 0.9
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.1,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000009000,
+    "pose": {
+      "x": 8.9571,
+      "y": 6.9115,
+      "theta": 0.91
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.09,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000009100,
+    "pose": {
+      "x": 8.9878,
+      "y": 6.951,
+      "theta": 0.92
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.08,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000009200,
+    "pose": {
+      "x": 9.0181,
+      "y": 6.9908,
+      "theta": 0.93
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.07,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000009300,
+    "pose": {
+      "x": 9.048,
+      "y": 7.0309,
+      "theta": 0.94
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.06,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000009400,
+    "pose": {
+      "x": 9.0775,
+      "y": 7.0712,
+      "theta": 0.95
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.05,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000009500,
+    "pose": {
+      "x": 9.1066,
+      "y": 7.1119,
+      "theta": 0.96
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.04,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000009600,
+    "pose": {
+      "x": 9.1353,
+      "y": 7.1529,
+      "theta": 0.97
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.03,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000009700,
+    "pose": {
+      "x": 9.1635,
+      "y": 7.1941,
+      "theta": 0.98
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.02,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000009800,
+    "pose": {
+      "x": 9.1914,
+      "y": 7.2356,
+      "theta": 0.99
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.01,
+    "status": "busy",
+    "errors": []
+  },
+  {
+    "robot_id": "robot-001",
+    "timestamp_ms": 1700000009900,
+    "pose": {
+      "x": 9.2188,
+      "y": 7.2774,
+      "theta": 1.0
+    },
+    "velocity": {
+      "linear": 0.5,
+      "angular": 0.1
+    },
+    "battery_percent": 99.0,
+    "status": "busy",
+    "errors": []
+  }
+]

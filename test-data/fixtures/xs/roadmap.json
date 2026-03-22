@@ -1,0 +1,54 @@
+{
+  "nodes": [
+    {
+      "id": "node-001",
+      "name": "Node-1",
+      "node_type": "waypoint",
+      "x": 5.950527730644147,
+      "y": 3.901739595934696,
+      "z": 0.0
+    },
+    {
+      "id": "node-002",
+      "name": "Node-2",
+      "node_type": "charging_station",
+      "x": 14.256481854952224,
+      "y": 9.797093336497847,
+      "z": 0.0
+    },
+    {
+      "id": "node-003",
+      "name": "Node-3",
+      "node_type": "loading_dock",
+      "x": 17.059232218687217,
+      "y": 2.13020482418241,
+      "z": 0.0
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-001",
+      "source": "node-001",
+      "target": "node-002",
+      "distance": 10.19,
+      "max_speed": 1.5,
+      "direction": "bi"
+    },
+    {
+      "id": "edge-002",
+      "source": "node-002",
+      "target": "node-003",
+      "distance": 8.16,
+      "max_speed": 1.5,
+      "direction": "bi"
+    },
+    {
+      "id": "edge-extra-1-0",
+      "source": "node-002",
+      "target": "node-001",
+      "distance": 10.19,
+      "max_speed": 1.0,
+      "direction": "bi"
+    }
+  ]
+}

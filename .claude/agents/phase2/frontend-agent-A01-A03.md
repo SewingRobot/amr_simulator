@@ -11,13 +11,13 @@ Build mission management UI (create, list, monitor) and remote teleoperation wit
 ## Week-by-Week Tasks
 
 ### Week 9-10: Mission List & Detail
-- [ ] MissionList component: filterable/sortable table (status, robot, time)
-- [ ] MissionDetail: step-by-step progress, timeline visualization
+- [x] MissionList component: filterable/sortable table (status, robot, time) — MissionListPage with status badges, filter, create button
+- [x] MissionDetail: status timeline, assign dropdown, cancel button — step-by-step progress not yet implemented
 - [ ] Real-time status updates via WebSocket (topic: "missions")
-- [ ] Mission status badges (color-coded)
+- [x] Mission status badges (color-coded)
 
 ### Week 11-12: Mission Creation
-- [ ] MissionCreator wizard: select robot → pick start/end waypoints on map → set priority
+- [ ] MissionCreator wizard: select robot → pick start/end waypoints on map → set priority — basic form exists but not map-integrated
 - [ ] Waypoint picker: click on 3D roadmap nodes
 - [ ] Path preview overlay on 3D viewer
 
